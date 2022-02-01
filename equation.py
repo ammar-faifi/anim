@@ -4,19 +4,15 @@ from manim import *
 class Eq(Scene):
     def construct(self):
         title = Tex('An $e^-$ inside potential').to_corner(UP + LEFT)
-        el = Dot()
         axes = Axes(
-            x_range=[-10, 10.3, 1],
-            y_range=[-1.5, 1.5, 1],
+            x_range=[-10, 10, 11],
+            y_range=[-1.5, 1.5, 4],
             x_length=6,
             y_length=3,
             axis_config={"color": WHITE},
-            x_axis_config={
-                "numbers_to_include": np.arange(-10, 10.01, 2),
-                "numbers_with_elongated_ticks": np.arange(-10, 10.01, 2),
-            },
             tips=False,
         ).shift(1.5*DOWN)
+        el = Dot().move_to(axes)
         plate_l = Rectangle(color=RED, height=6, width=2,
                             fill_opacity=1).shift(4*LEFT)
         plate_r = Rectangle(color=BLUE, height=6, width=2,
@@ -33,14 +29,16 @@ class Eq(Scene):
 
         """ start of show """
         self.play(Create(title))
-        self.play(Create(plates))
+        self.play(FadeIn(plates))
         self.play(Create(vector_field))
 
         self.play(Create(el))
 
-        self.play(plates.animate.scale(0.5).shift(2*UP))
-        self.play(vector_field.animate.scale(0.5).shift(2*UP))
+        self.play(
+            plates.animate.scale(0.5).shift(1.8*UP),
+            vector_field.animate.scale(0.5).shift(1.8*UP),
+            el.animate.shift(2.3*UP),
+        )
 
         self.play(Create(axes))
         self.wait(1)
-        
