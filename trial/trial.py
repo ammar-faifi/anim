@@ -12,8 +12,6 @@ class PointMovingOnShapes(Scene):
         line = Line([3, 0, 0], [5, 0, 5])
         self.add(line)
 
-        sq.next_to(ORIGIN, RIGHT, buff=0.5)
-
         self.play(GrowFromCenter(circle))
         self.play(Transform(dot, dot2))
         self.play(MoveAlongPath(dot, circle), run_time=2, rate_func=linear)
