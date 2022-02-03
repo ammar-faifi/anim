@@ -36,5 +36,18 @@ class Eq(Scene):
         self.play(Create(el))
         self.play(set_up.animate.scale(0.5).shift(1.2 * UP))
 
+        disc = [axes.point_to_coords(plate_l.get_right())[0],
+                axes.point_to_coords(plate_r.get_left())[0]]
+
+        def potential(x):
+            if disc[0] <= x <= disc[1]:
+                return 0
+            else:
+                return 1
+
+        plot = axes.plot(potential, discontinuities=disc, dt=0.1, color=WHITE)
+        plot.make_jagged()
+
         self.play(Create(axes))
+        self.play(FadeIn(plot))
         self.wait(1)
