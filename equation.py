@@ -39,6 +39,7 @@ class Eq(Scene):
         self.play(Create(vector_field))
 
         self.play(Create(el))
+        self.wait()
         self.play(set_up.animate.scale(0.5).shift(1.2 * UP))
 
         disc_l = axes.point_to_coords(plate_l.get_right())[0]
@@ -71,7 +72,7 @@ class Eq(Scene):
             Transform(plot, plot2),
             FadeOut(vector_field),
         )
-        force_arrow.next_to(el, LEFT).flip()
+        force_arrow.next_to(el, LEFT).flip().shift(DOWN * 0.1)
         force_label.next_to(force_arrow, DOWN)
         self.play(FadeIn(VGroup(force_arrow, force_label)))
         self.wait()
