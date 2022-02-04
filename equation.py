@@ -11,19 +11,19 @@ class Eq(Scene):
             y_length=3,
             axis_config={"color": WHITE, 'font_size': 5},
         ).shift(2.3*DOWN)
-        x_label = axes.get_x_axis_label(MathTex('V(x)', font_size=30))
-        y_label = axes.get_y_axis_label(MathTex('x', font_size=30))
+        x_label = axes.get_x_axis_label(MathTex('x', font_size=30))
+        y_label = axes.get_y_axis_label(MathTex('V(x)', font_size=30))
         axes_g = VGroup(axes, x_label, y_label)
         
         plate_l = Rectangle(color=BLUE, height=6, width=2,
                             fill_opacity=1).shift(4*LEFT)
         plate_r = Rectangle(color=RED, height=6, width=2,
                             fill_opacity=1).shift(4*RIGHT)
-        pos_sign = MathTex('+', font_size=70).next_to(plate_r.get_center())
+        pos_sign = MathTex('+', font_size=70).move_to(plate_r.get_center())
         neg_sign = MathTex('-', font_size=70).move_to(plate_l.get_center())
 
         def func(x):
-            return np.array([1.0, 0.0, 0.0])
+            return np.array([-1.0, 0.0, 0.0])
         x_range = [plate_l.get_right()[0], plate_r.get_left()[0], 1.]
         y_range = [plate_l.get_bottom()[1], plate_l.get_top()[1], 1.]
         vector_field = ArrowVectorField(
