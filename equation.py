@@ -14,7 +14,7 @@ class Eq(Scene):
         x_label = axes.get_x_axis_label(MathTex('x', font_size=30))
         y_label = axes.get_y_axis_label(MathTex('V(x)', font_size=30))
         axes_g = VGroup(axes, x_label, y_label)
-        
+
         plate_l = Rectangle(color=BLUE, height=6, width=2,
                             fill_opacity=1).shift(4*LEFT)
         plate_r = Rectangle(color=RED, height=6, width=2,
@@ -55,7 +55,10 @@ class Eq(Scene):
         plot2 = axes.plot_line_graph(
             [-8, disc[0], disc[0]+eps, disc[0]+3], [0, 0, 1, 1], add_vertex_dots=False)
 
-        self.wait(2)
+        self.wait()
         self.play(Create(axes_g))
         self.play(FadeIn(plot2))
-        self.wait(1)
+        self.wait()
+
+        self.play(el.animate(rate_func=rate_functions.ease_in_quad).move_to(plate_r.get_left(), ))
+        self.wait
