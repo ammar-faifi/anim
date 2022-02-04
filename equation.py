@@ -9,12 +9,18 @@ class Eq(Scene):
             y_range=[-1.5, 1.5, 4],
             x_length=6,
             y_length=3,
-            axis_config={"color": WHITE},
+            axis_config={"color": WHITE, 'font_size': 5},
         ).shift(2*DOWN)
-        plate_l = Rectangle(color=RED, height=6, width=2,
+        x_label = axes.get_x_axis_label('V(x)')
+        y_label = axes.get_y_axis_label('x')
+        axes_g = VGroup(axes, x_label, y_label)
+        
+        plate_l = Rectangle(color=BLUE, height=6, width=2,
                             fill_opacity=1).shift(4*LEFT)
-        plate_r = Rectangle(color=BLUE, height=6, width=2,
+        plate_r = Rectangle(color=RED, height=6, width=2,
                             fill_opacity=1).shift(4*RIGHT)
+        pos_sign = Tex('$+$').next_to(plate_r.get_center())
+        neg_sign = Tex('$-$').move_to(plate_l.get_center())
 
         def func(x):
             return np.array([1.0, 0.0, 0.0])
@@ -24,7 +30,7 @@ class Eq(Scene):
             func, x_range=x_range, y_range=y_range, length_func=lambda x: x / 2, opacity=0.5
         )
         el = Dot().move_to([0, plate_l.get_center()[1], 0])
-        plates = VGroup(plate_l, plate_r)
+        plates = VGroup(plate_l, plate_r, pos_sign, neg_sign)
         set_up = VGroup(plates, el, vector_field)
 
         """ start of show """
@@ -50,6 +56,6 @@ class Eq(Scene):
             [-8, disc[0], disc[0]+eps, disc[0]+2], [0, 0, 1, 1], add_vertex_dots=False)
 
         self.wait(2)
-        self.play(Create(axes))
+        self.play(Create(axes_g))
         self.play(FadeIn(plot2))
         self.wait(1)
