@@ -19,8 +19,8 @@ class Eq(Scene):
                             fill_opacity=1).shift(4*LEFT)
         plate_r = Rectangle(color=RED, height=6, width=2,
                             fill_opacity=1).shift(4*RIGHT)
-        pos_sign = Tex('$+$').next_to(plate_r.get_center())
-        neg_sign = Tex('$-$').move_to(plate_l.get_center())
+        pos_sign = MathTex('+', font_size=70).next_to(plate_r.get_center())
+        neg_sign = MathTex('-', font_size=70).move_to(plate_l.get_center())
 
         def func(x):
             return np.array([1.0, 0.0, 0.0])
