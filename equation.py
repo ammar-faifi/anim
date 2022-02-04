@@ -41,28 +41,42 @@ class Eq(Scene):
         self.play(Create(el))
         self.play(set_up.animate.scale(0.5).shift(1.2 * UP))
 
-        disc = [axes.point_to_coords(plate_r.get_left())[0]]
+        disc_l = axes.point_to_coords(plate_l.get_right())[0]
+        disc_r = axes.point_to_coords(plate_r.get_left())[0]
 
-        def potential(x):
-            if x >= disc[0]:
-                return 1
-            else:
-                return 0
-
-        plot = axes.plot(potential, discontinuities=disc, dt=0.1, color=BLUE)
-        plot.make_jagged()
         eps = 1e-8
+        plot = axes.plot_line_graph(
+            [-10, disc_l, disc_l+eps, disc_r, disc_r+eps, disc_r+3], [-1, -1, 0, 0, 1, 1], add_vertex_dots=False)
         plot2 = axes.plot_line_graph(
-            [-8, disc[0], disc[0]+eps, disc[0]+3], [0, 0, 1, 1], add_vertex_dots=False)
+            [-10, disc_r+3], [-1, -1], add_vertex_dots=False)
 
         self.wait()
         self.play(Create(axes_g))
-        self.play(FadeIn(plot2))
+        self.play(FadeIn(plot))
         self.wait()
 
-        force = Arrow([-0.5, 1, 0], [+0.5, 1, 0])
-
-        self.play(Create(force))
+        force_arrow = Arrow([-0.5, 1, 0], [+0.5, 1, 0])
+        force_label = MathTex('F_e', font_size=20).next_to(force_arrow)
+        self.play(Create(force_arrow), Create(force_label))
         self.wait()
-        self.play(el.animate(rate_func=rate_functions.ease_in_quad).move_to(plate_r.get_left()))
-        self.wait
+        el_origin = el.get_center()
+        self.play(el.animate(rate_func=rate_functions.ease_in_quad).move_to(
+            plate_r.get_left()))
+        self.play(FadeOut(force_arrow), FadeOut(force_label))
+        self.wait()
+
+        self.play(
+            plate_r.animate.set_color(BLUE),
+            Transform(pos_sign, neg_sign.copy().move_to(plate_r.get_center())),
+            Transform(plot, plot2),
+            FadeOut(vector_field),
+        )
+        force_arrow.next_to(el, LEFT).flip()
+        force_label.next_to(force_arrow, DOWN)
+        self.play(FadeIn(VGroup(force_arrow, force_label)))
+        self.wait()
+
+        self.play(el.animate(
+            rate_func=rate_functions.ease_in_quad).move_to(el_origin))
+        self.play(FadeOut(VGroup(force_arrow, force_label)))
+        self.wait()
