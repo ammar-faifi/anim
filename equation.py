@@ -10,9 +10,9 @@ class Eq(Scene):
             x_length=6,
             y_length=3,
             axis_config={"color": WHITE, 'font_size': 5},
-        ).shift(2*DOWN)
-        x_label = axes.get_x_axis_label('V(x)')
-        y_label = axes.get_y_axis_label('x')
+        ).shift(2.3*DOWN)
+        x_label = axes.get_x_axis_label(MathTex('V(x)', font_size=30))
+        y_label = axes.get_y_axis_label(MathTex('x', font_size=30))
         axes_g = VGroup(axes, x_label, y_label)
         
         plate_l = Rectangle(color=BLUE, height=6, width=2,
@@ -53,7 +53,7 @@ class Eq(Scene):
         plot.make_jagged()
         eps = 1e-8
         plot2 = axes.plot_line_graph(
-            [-8, disc[0], disc[0]+eps, disc[0]+2], [0, 0, 1, 1], add_vertex_dots=False)
+            [-8, disc[0], disc[0]+eps, disc[0]+3], [0, 0, 1, 1], add_vertex_dots=False)
 
         self.wait(2)
         self.play(Create(axes_g))
