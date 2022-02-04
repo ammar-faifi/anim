@@ -60,5 +60,9 @@ class Eq(Scene):
         self.play(FadeIn(plot2))
         self.wait()
 
-        self.play(el.animate(rate_func=rate_functions.ease_in_quad).move_to(plate_r.get_left(), ))
+        force = Arrow([-0.5, 1, 0], [+0.5, 1, 0])
+
+        self.play(Create(force))
+        self.wait()
+        self.play(el.animate(rate_func=rate_functions.ease_in_quad).move_to(plate_r.get_left()))
         self.wait
