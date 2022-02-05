@@ -87,7 +87,10 @@ class Scene3D(ThreeDScene):
     def construct(self):
         ax = ThreeDAxes()
 
-        self.set_camera_orientation(phi=2*PI/5, theta=PI/5)
-
         self.add(ax)
+        self.set_camera_orientation(phi=2*PI/5, theta=PI/5)
+        self.begin_ambient_camera_rotation(rate=0.1)
+        self.wait()
+        self.stop_ambient_camera_rotation()
+        self.move_camera(phi=75 * DEGREES, theta=30 * DEGREES)
         self.wait()
