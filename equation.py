@@ -81,3 +81,13 @@ class Eq(Scene):
             rate_func=rate_functions.ease_in_quad).move_to(el_origin))
         self.play(FadeOut(VGroup(force_arrow, force_label)))
         self.wait()
+
+
+class Scene3D(ThreeDScene):
+    def construct(self):
+        ax = ThreeDAxes()
+
+        self.set_camera_orientation(phi=2*PI/5, theta=PI/5)
+
+        self.add(ax)
+        self.wait()
