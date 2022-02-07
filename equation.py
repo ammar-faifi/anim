@@ -93,6 +93,8 @@ class Eq(Scene):
         self.play(Transform(energy_eq, MathTex('K = E - V').to_edge()))
         self.wait()
         self.play(Transform(energy_eq, MathTex('K > V').to_edge()))
+        self.play(Indicate(plot2))
+        self.play(Indicate(plot_E, WHITE))
 
 
 
