@@ -85,7 +85,15 @@ class Eq(Scene):
         self.wait()
         self.play(Transform(title, Tex('$e^-$ can reach the plates with enough energy')))
 
+        energy_eq = MathTex('E = K + V').to_edge()
+
         self.play(Create(plot_E))
+        self.play(Write(energy_eq))
+        self.wait()
+        self.play(Transform(energy_eq, MathTex('K = E - V').to_edge()))
+        self.wait()
+        self.play(Transform(energy_eq, MathTex('K > V').to_edge()))
+
 
 
 class Scene3D(ThreeDScene):
