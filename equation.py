@@ -49,8 +49,8 @@ class Eq(Scene):
         plot = axes.plot_line_graph(
             [-8, disc_l, disc_l+eps, disc_r, disc_r+eps, disc_r+3], [-1, -1, 0, 0, 1, 1], add_vertex_dots=False)
         plot2 = axes.plot_line_graph(
-            [-8, disc_r+3], [-1, -1], add_vertex_dots=False)
-        plot_E = axes.plot_line_graph([-8, 8], [0.5, 0.5], add_vertex_dots=False)
+            [-8, disc_r+3], [-0.8, -0.8], add_vertex_dots=False)
+        plot_E = axes.plot_line_graph([-8, 8], [0.5, 0.5], add_vertex_dots=False, line_color=BLUE)
 
 
         self.wait()
