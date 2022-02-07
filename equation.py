@@ -47,10 +47,10 @@ class Eq(Scene):
 
         eps = 1e-8
         plot = axes.plot_line_graph(
-            [-10, disc_l, disc_l+eps, disc_r, disc_r+eps, disc_r+3], [-1, -1, 0, 0, 1, 1], add_vertex_dots=False)
+            [-8, disc_l, disc_l+eps, disc_r, disc_r+eps, disc_r+3], [-1, -1, 0, 0, 1, 1], add_vertex_dots=False)
         plot2 = axes.plot_line_graph(
-            [-10, disc_r+3], [-1, -1], add_vertex_dots=False)
-        plot_E = axes.plot_line_graph([-8, 8], [0.5, 0.5], )
+            [-8, disc_r+3], [-1, -1], add_vertex_dots=False)
+        plot_E = axes.plot_line_graph([-8, 8], [0.5, 0.5], add_vertex_dots=False)
 
 
         self.wait()
@@ -83,7 +83,7 @@ class Eq(Scene):
             rate_func=rate_functions.ease_in_quad).move_to(el_origin))
         self.play(FadeOut(VGroup(force_arrow, force_label)))
         self.wait()
-        self.play(Transform(title, Tex('$e^-$ can reach the plates with enough energy')))
+        self.play(Transform(title, Tex('$e^-$ can reach the plates with enough energy').to_corner(UL)))
 
         energy_eq = MathTex('E = K + V').to_edge()
 
