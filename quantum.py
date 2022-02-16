@@ -29,12 +29,12 @@ class TISE(Scene):
             MathTex(r'\Psi = \Psi(x, t)'),
             MathTex(r'U = U(x)'),
             MathTex(r'\Psi(x, t) = \psi(x) \phi(t)'),
-        ).arrange(DOWN, aligned_edge=LEFT).to_edge(LEFT).shift(UP).scale(0.5)
+        ).arrange(DOWN, aligned_edge=LEFT).scale(0.7).to_edge(LEFT).shift(1.9*UP)
 
         text_sep = Text('Separation of Variables').shift(2*DOWN)
         self.play(Write(tdse))
         self.play(Write(func[0]))
-        self.play(tdse.animate.shift(1.5*UP).scale(0.25))
+        self.play(tdse.animate.shift(1.8*UP).scale(0.5))
         self.play(FadeIn(text_sep))
         self.wait()
         self.play(FadeOut(text_sep))
