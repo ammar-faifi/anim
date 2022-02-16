@@ -2,6 +2,11 @@ from manim import *
 
 
 class TISE(Scene):
+    def fade_in_out(self, obj, delay=1):
+        self.play(FadeIn(obj))
+        self.wait(delay)
+        self.play(FadeOut(obj))
+
     def construct(self):
         title = Title("Solving Time-Dependent Schrödinger Equation")
 
@@ -52,12 +57,12 @@ class TISE(Scene):
             .shift(1.9 * UP)
         )
 
-        text_sep = Text("Separation of Variables").shift(2 * DOWN)
         self.play(Write(tdse))
         self.play(Write(func[0]))
         self.play(tdse.animate.shift(1.8 * UP).scale(0.5))
-        self.play(FadeIn(text_sep))
-        self.wait()
-        self.play(FadeOut(text_sep))
+        self.fade_in_out(Text("Separation of Variables").shift(2 * DOWN))
         self.play(Write(func[1]))
         self.play(Write(func[2]))
+
+        self.play(Circumscribe(tdse[1]), Circumscribe(tdse[3]))
+        self.wait()
