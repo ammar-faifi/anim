@@ -1,0 +1,3 @@
+{
+    "code-runner.customCommand": "$dir/env/bin/manim $fullFileName -spql",
+}
