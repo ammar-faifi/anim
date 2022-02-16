@@ -34,9 +34,9 @@ class TISE(Scene):
         self.wait()
 
         tdse = MathTex(
-            r"i\hbar \frac{\partial",
-            r"\Psi}{\partial t}",
-            r"= - \frac{\hbar^2}{2m} ",
+            r"i\hbar",
+            r"\frac{\partial\Psi}{\partial t}",
+            r"= - \frac{\hbar^2}{2m}",
             r"\frac{\partial^2 \Psi}{\partial x^2}",
             r"+U\Psi",
         ).scale(1.5)
