@@ -38,13 +38,17 @@ class TISE(Scene):
         self.play(FadeOut(steps))
         self.wait()
 
-        tdse = MathTex(
-            r"i\hbar",
-            r"\frac{\partial\Psi}{\partial t}",
-            r"= - \frac{\hbar^2}{2m}",
-            r"\frac{\partial^2 \Psi}{\partial x^2}",
-            r"+U\Psi",
-        ).scale(1.5)
+        tdse = (
+            MathTex(
+                r"i\hbar",
+                r"\frac{\partial\Psi}{\partial t}",
+                r"= - \frac{\hbar^2}{2m}",
+                r"\frac{\partial^2 \Psi}{\partial x^2}",
+                r"+U\Psi",
+            )
+            .scale(1.5)
+            .shift(RIGHT)
+        )
         func = (
             VGroup(
                 MathTex(r"\Psi = \Psi(x, t)"),
@@ -74,3 +78,25 @@ class TISE(Scene):
         self.wait()
         self.play(Write(func[3]))
         self.play(Write(func[4]))
+
+        tise = (
+            MathTex(
+                r"i \hbar \psi\frac{d \phi}{d t}",
+                "=",
+                r"- \frac{\hbar^2}{2m} \frac{d^2 \psi}{d x^2} \phi +" r"U \psi \phi",
+            )
+            .scale(0.75)
+            .next_to(tdse, DOWN, buff=1)
+        )
+        tise_1 = (
+            MathTex(
+                r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t}",
+                "=",
+                r"- \frac{\hbar^2}{2m} \frac{1}{\psi} \frac{d^2 \psi}{d x^2} +" r"U",
+            )
+            .scale(0.75)
+            .next_to(tdse, DOWN, buff=1)
+        )
+        self.play(Write(tise))
+        self.wait()
+        self.play(Transform(tise, tise_1))
