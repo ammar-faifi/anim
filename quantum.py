@@ -3,16 +3,16 @@ from manim import *
 
 class TISE(Scene):
     def construct(self):
-        title = Title('Start Solving Time-Dependent Schrödinger Equation')
+        title = Title('Solving Time-Dependent Schrödinger Equation')
 
         self.play(Write(title))
         self.wait()
 
         steps = VGroup(
             Text("1. Solve Shcödinger's PDE",),
-            Text("2. Using Hamiltonian Operator",),
+            Text("2. Using Hamiltonian operator",),
             Text("3. Find the general solution",),
-            Text("4. Talk about some intresting properties."),
+            Text("4. Some intresting properties."),
         ).arrange(DOWN, aligned_edge=LEFT, buff=0.5).scale(0.7).shift(0.2*UP)
 
         for obj in steps:
