@@ -50,11 +50,17 @@ class TISE(Scene):
                 MathTex(r"\Psi = \Psi(x, t)"),
                 MathTex(r"U = U(x)"),
                 MathTex(r"\Psi(x, t) = \psi(x) \phi(t)"),
+                MathTex(
+                    r"\frac{\partial\Psi}{\partial t} = \psi(x)\frac{d \phi(t)}{d t}"
+                ),
+                MathTex(
+                    r"\frac{\partial^2 \Psi}{\partial x^2} = \phi(t) \frac{d^2 \psi(x)}{d x^2}"
+                ),
             )
             .arrange(DOWN, aligned_edge=LEFT)
             .scale(0.7)
             .to_edge(LEFT)
-            .shift(1.9 * UP)
+            .shift(UP)
         )
 
         self.play(Write(tdse))
@@ -66,3 +72,5 @@ class TISE(Scene):
 
         self.play(Circumscribe(tdse[1]), Circumscribe(tdse[3]))
         self.wait()
+        self.play(Write(func[3]))
+        self.play(Write(func[4]))
