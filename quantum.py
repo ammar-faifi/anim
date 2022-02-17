@@ -111,3 +111,33 @@ class TISE(Scene):
         self.play(FadeOut(frame_x))
         self.wait()
         self.play(Create(equal_E))
+        self.wait()
+
+        time_dep = VGroup(
+            MathTex(
+                r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t} = E",
+            ),
+            MathTex(
+                r" \frac{1}{\phi} \frac{d \phi}{d t} = \frac{E}{i \hbar }",
+            ),
+        ).to_edge(LEFT, buff=1)
+
+        time_ind = VGroup(
+            MathTex(
+                r"- \frac{\hbar^2}{2m} \frac{1}{\psi} \frac{d^2 \psi}{d x^2} + U = E",
+            ),
+            MathTex(
+                r"- \frac{\hbar^2}{2m} \frac{d^2 \psi}{d x^2} + U = E \psi",
+            ),
+        ).to_edge(RIGHT, buff=1)
+
+        self.play(*[FadeOut(obj) for obj in [tdse, func, equal_E]])
+        self.play(
+            ReplacementTransform(tise.copy(), time_dep[0]),
+            ReplacementTransform(tise.copy(), time_ind[0]),
+            FadeOut(tise),
+        )
+        self.wait()
+        self.play(Transform(time_ind[0], time_ind[1]))
+        self.play(Transform(time_dep[0], time_dep[1]))
+        self.play(time_dep.animate.shift(UP))
