@@ -113,14 +113,45 @@ class TISE(Scene):
         self.play(Create(equal_E))
         self.wait()
 
-        time_dep = VGroup(
-            MathTex(
-                r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t} = E",
-            ),
-            MathTex(
-                r" \frac{1}{\phi} \frac{d \phi}{d t} = \frac{E}{i \hbar }",
-            ),
-        ).to_edge(LEFT, buff=1)
+        separation = MathTex(r"\Psi(x, t) = \phi(t) \psi(x)").to_edge(UP, 4)
+        time_dep = (
+            VGroup(
+                # 0
+                MathTex(
+                    r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t} = E",
+                ),
+                # 1
+                MathTex(
+                    r" \frac{1}{\phi} \frac{d \phi}{d t} = \frac{E}{i \hbar }",
+                ),
+                # 2
+                MathTex(
+                    r"\frac{d \phi}{\phi} = \frac{E}{i \hbar }\, dt",
+                ),
+                # 3
+                MathTex(
+                    r"\int \frac{d \phi}{\phi} = \int \frac{E}{i \hbar }\, dt",
+                ),
+                # 4
+                MathTex(
+                    r"{\ln(\phi)} = \frac{E}{i \hbar }t + C",
+                ),
+                # 5
+                MathTex(
+                    r"e^{\ln(\phi)} = e^{\frac{E}{i \hbar }t + C}",
+                ),
+                # 6
+                MathTex(
+                    r"\phi = e^{\frac{E}{i \hbar }t} \times {{e^C}}",
+                ),
+            )
+            .arrange(DOWN)
+            .to_edge(LEFT, buff=1)
+            .shift(0.7 * DOWN)
+        )
+        time_dep_sol = (
+            MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2).to_edge(LEFT, 1)
+        )
 
         time_ind = VGroup(
             MathTex(
@@ -141,3 +172,16 @@ class TISE(Scene):
         self.play(Transform(time_ind[0], time_ind[1]))
         self.play(Transform(time_dep[0], time_dep[1]))
         self.play(time_dep.animate.shift(UP))
+        self.fade_in_out(Text("Separable DE", 2))
+
+        self.play(Transform(time_dep[1], time_dep[2]))
+        self.play(Transform(time_dep[2], time_dep[3]))
+        self.play(
+            LaggedStart(*[FadeOut(obj) for obj in time_dep[:4]]),
+            time_dep.animate.shift(3 * UP),
+        )
+        self.play(Transform(time_dep[4], time_dep[5]))
+        self.play(Transform(time_dep[5], time_dep[6]))
+        self.play(Circumscribe(time_dep[6][-1]))
+        self.fade_in_out(separation, 4)
+        self.play(Transform(time_dep[6], time_dep_sol))
