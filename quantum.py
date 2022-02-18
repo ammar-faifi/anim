@@ -158,7 +158,7 @@ class TISE(Scene):
                 r"- \frac{\hbar^2}{2m} \frac{1}{\psi} \frac{d^2 \psi}{d x^2} + U = E",
             ),
             MathTex(
-                r"- \frac{\hbar^2}{2m} \frac{d^2 \psi}{d x^2} + U = E \psi",
+                r"- \frac{\hbar^2}{2m} \frac{d^2 \psi}{d x^2} + U\psi = E \psi",
             ),
         ).to_edge(RIGHT, buff=1)
 
