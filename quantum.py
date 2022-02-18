@@ -113,7 +113,7 @@ class TISE(Scene):
         self.play(Create(equal_E))
         self.wait()
 
-        separation = MathTex(r"\Psi(x, t) = \phi(t) \psi(x)").to_edge(UP, 4)
+        separation = MathTex(r"\Psi(x, t) = \phi(t) \psi(x)").to_edge(UP, 2)
         time_dep = (
             VGroup(
                 # 0
@@ -179,8 +179,11 @@ class TISE(Scene):
         )
         time_dep.shift(3 * UP)
         self.play(Write(time_dep[4]))
-        self.play(Transform(time_dep[4], time_dep[5]))
-        self.play(Transform(time_dep[5], time_dep[6]))
+        self.play(ReplacementTransform(time_dep[4], time_dep[5]))
+        self.play(ReplacementTransform(time_dep[5], time_dep[6]))
         self.play(Circumscribe(time_dep[6][-1]))
         self.fade_in_out(separation)
-        self.play(Transform(time_dep[6], time_dep_sol))
+        self.play(ReplacementTransform(time_dep[6].copy(), time_dep_sol))
+        self.play(
+            LaggedStart(FadeOut(time_dep[5]), FadeOut(time_dep[6])),
+        )
