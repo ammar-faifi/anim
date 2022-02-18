@@ -147,7 +147,7 @@ class TISE(Scene):
             )
             .arrange(DOWN)
             .to_edge(LEFT, buff=1)
-            .shift(0.7 * DOWN)
+            .shift(1.5 * DOWN)
         )
         time_dep_sol = (
             MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2).to_edge(LEFT, 1)
@@ -165,23 +165,22 @@ class TISE(Scene):
         self.play(*[FadeOut(obj) for obj in [tdse, func, equal_E]])
         self.play(
             ReplacementTransform(tise.copy(), time_dep[0]),
-            ReplacementTransform(tise.copy(), time_ind[0]),
-            FadeOut(tise),
+            ReplacementTransform(tise, time_ind[0]),
         )
         self.wait()
         self.play(Transform(time_ind[0], time_ind[1]))
         self.play(Transform(time_dep[0], time_dep[1]))
-        self.play(time_dep.animate.shift(UP))
-        self.fade_in_out(Text("Separable DE", 2))
+        self.fade_in_out(Text("Separable DE", 2).to_edge(UP, 1.5))
 
         self.play(Transform(time_dep[1], time_dep[2]))
         self.play(Transform(time_dep[2], time_dep[3]))
         self.play(
             LaggedStart(*[FadeOut(obj) for obj in time_dep[:4]]),
-            time_dep.animate.shift(3 * UP),
         )
+        time_dep.shift(3 * UP)
+        self.play(Write(time_dep[4]))
         self.play(Transform(time_dep[4], time_dep[5]))
         self.play(Transform(time_dep[5], time_dep[6]))
         self.play(Circumscribe(time_dep[6][-1]))
-        self.fade_in_out(separation, 4)
+        self.fade_in_out(separation)
         self.play(Transform(time_dep[6], time_dep_sol))
