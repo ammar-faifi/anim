@@ -114,44 +114,38 @@ class TISE(Scene):
         self.wait()
 
         separation = MathTex(r"\Psi(x, t) = \phi(t) \psi(x)").to_edge(UP, 2)
-        time_dep = (
-            VGroup(
-                # 0
-                MathTex(
-                    r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t} = E",
-                ),
-                # 1
-                MathTex(
-                    r" \frac{1}{\phi} \frac{d \phi}{d t} = \frac{E}{i \hbar }",
-                ),
-                # 2
-                MathTex(
-                    r"\frac{d \phi}{\phi} = \frac{E}{i \hbar }\, dt",
-                ),
-                # 3
-                MathTex(
-                    r"\int \frac{d \phi}{\phi} = \int \frac{E}{i \hbar }\, dt",
-                ),
-                # 4
-                MathTex(
-                    r"{\ln(\phi)} = \frac{E}{i \hbar }t + C",
-                ),
-                # 5
-                MathTex(
-                    r"e^{\ln(\phi)} = e^{\frac{E}{i \hbar }t + C}",
-                ),
-                # 6
-                MathTex(
-                    r"\phi = e^{\frac{E}{i \hbar }t} \times {{e^C}}",
-                ),
-            )
-            .arrange(DOWN)
-            .to_edge(LEFT, buff=1)
-            .shift(1.5 * DOWN)
-        )
-        time_dep_sol = (
-            MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2).to_edge(LEFT, 1)
-        )
+        time_dep = VGroup(
+            # 0
+            MathTex(
+                r"i \hbar \frac{1}{\phi} \frac{d \phi}{d t} = E",
+            ),
+            # 1
+            MathTex(
+                r" \frac{1}{\phi} \frac{d \phi}{d t} = \frac{E}{i \hbar }",
+            ),
+            # 2
+            MathTex(
+                r"\frac{d \phi}{\phi} = \frac{E}{i \hbar }\, dt",
+            ),
+            # 3
+            MathTex(
+                r"\int \frac{d \phi}{\phi} = \int \frac{E}{i \hbar }\, dt",
+            ),
+            # 4
+            MathTex(
+                r"{\ln(\phi)} = \frac{E}{i \hbar }t + C",
+            ),
+            # 5
+            MathTex(
+                r"e^{\ln(\phi)} = e^{\frac{E}{i \hbar }t + C}",
+            ),
+            # 6
+            MathTex(
+                r"\phi(t) = e^{\frac{E}{i \hbar }t} \times {{e^C}}",
+            ),
+        ).scale(1.5)
+        time_dep[0].scale(1 / 1.5)
+        time_dep_sol = MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2)
 
         time_ind = VGroup(
             MathTex(
@@ -163,27 +157,22 @@ class TISE(Scene):
         ).to_edge(RIGHT, buff=1)
 
         self.play(*[FadeOut(obj) for obj in [tdse, func, equal_E]])
+        time_dep[0].to_edge(LEFT, 1.5)
         self.play(
             ReplacementTransform(tise.copy(), time_dep[0]),
             ReplacementTransform(tise, time_ind[0]),
         )
         self.wait()
-        self.play(Transform(time_ind[0], time_ind[1]))
-        self.play(Transform(time_dep[0], time_dep[1]))
+        self.play(ReplacementTransform(time_ind[0], time_ind[1]))
+        self.play(FadeOut(time_ind))
+
+        # derive time dep part
+        self.play(ReplacementTransform(time_dep[0], time_dep[1]))
         self.fade_in_out(Text("Separable DE", 2).to_edge(UP, 1.5))
 
-        self.play(Transform(time_dep[1], time_dep[2]))
-        self.play(Transform(time_dep[2], time_dep[3]))
-        self.play(
-            LaggedStart(*[FadeOut(obj) for obj in time_dep[:4]]),
-        )
-        time_dep.shift(3 * UP)
-        self.play(Write(time_dep[4]))
-        self.play(ReplacementTransform(time_dep[4], time_dep[5]))
-        self.play(ReplacementTransform(time_dep[5], time_dep[6]))
+        for i in range(1, 6):
+            self.play(ReplacementTransform(time_dep[i], time_dep[i + 1]))
+
         self.play(Circumscribe(time_dep[6][-1]))
-        self.fade_in_out(separation)
-        self.play(ReplacementTransform(time_dep[6].copy(), time_dep_sol))
-        self.play(
-            LaggedStart(FadeOut(time_dep[5]), FadeOut(time_dep[6])),
-        )
+        self.play(Write(separation))
+        self.play(ReplacementTransform(time_dep[6], time_dep_sol))
