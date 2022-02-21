@@ -181,7 +181,8 @@ class TISE(Scene):
 
         self.play(Circumscribe(time_dep[6][-1]))
         self.play(Write(Psi))
-        self.play(ReplacementTransform(time_dep[6], time_dep_sol))
-        self.play(ReplacementTransform(Psi, Psi_t))
+        # self.play(ReplacementTransform(time_dep[6], time_dep_sol))
+        self.play(ReplacementTransform(Psi, Psi_t), FadeOut(time_dep[6]))
 
         # derive time ind solutions
+        self.play(Psi_t.animate.move_to(ORIGIN).scale(2))
