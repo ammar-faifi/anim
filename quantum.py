@@ -113,7 +113,10 @@ class TISE(Scene):
         self.play(Create(equal_E))
         self.wait()
 
-        separation = MathTex(r"\Psi(x, t) = \phi(t) \psi(x)").to_edge(UP, 2)
+        Psi = MathTex(r"\Psi(x, t) = \psi(x)\, \phi(t)").to_edge(UP, 2)
+        Psi_t = MathTex(
+            r"\Psi(x, t) = \psi(x)\, e^{\frac{E}{i \hbar }t} {{\cdot}} {{e^C}}"
+        ).move_to(Psi)
         time_dep = VGroup(
             # 0
             MathTex(
@@ -141,11 +144,13 @@ class TISE(Scene):
             ),
             # 6
             MathTex(
-                r"\phi(t) = e^{\frac{E}{i \hbar }t} \times {{e^C}}",
+                r"\phi(t) = e^{\frac{E}{i \hbar }t} \cdot {{e^C}}",
             ),
         ).scale(1.5)
         time_dep[0].scale(1 / 1.5)
-        time_dep_sol = MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2)
+        time_dep_sol = (
+            MathTex(r"\phi(t) = e^{\frac{E}{i \hbar }t}").scale(2).shift(0.5 * DOWN)
+        )
 
         time_ind = VGroup(
             MathTex(
@@ -172,7 +177,11 @@ class TISE(Scene):
 
         for i in range(1, 6):
             self.play(ReplacementTransform(time_dep[i], time_dep[i + 1]))
+            self.wait(0.5)
 
         self.play(Circumscribe(time_dep[6][-1]))
-        self.play(Write(separation))
+        self.play(Write(Psi))
         self.play(ReplacementTransform(time_dep[6], time_dep_sol))
+        self.play(ReplacementTransform(Psi, Psi_t))
+
+        # derive time ind solutions
