@@ -37,33 +37,55 @@ class Intro(Scene):
 
 class EquationsOfMotion(Scene):
     def construct(self):
-        particle1 = ma.VGroup(
-            ma.Circle(1.0, ma.RED, fill_opacity=1),
-            ma.MathTex("1"),
+        pass
+        newton_eq = ma.MathTex("F = ma")
+        verlet = ma.MathTex(
+            r"\displaystyle {\boldsymbol {M}}{\ddot {\mathbf {x} }}(t)=F{\bigl (}\mathbf {x} (t){\bigr )}=-\nabla V{\bigl (}\mathbf {x} (t){\bigr )}"
         )
-        particle2 = ma.VGroup(
-            ma.Circle(1.0, ma.RED, fill_opacity=1),
-            ma.MathTex("2"),
-        )
-        self.play(ma.Create(particle1))
+
+        self.play(ma.Write(newton_eq))
+        self.wait()
+        self.embed()
+
+
+class Collision(Scene):
+    def construct(self):
+        circle1 = ma.VGroup(
+            ma.Circle(1.0, ma.RED, fill_opacity=1), ma.MathTex("1")
+        ).shift(2 * ma.LEFT)
+        circle2 = ma.VGroup(
+            ma.Circle(1.0, ma.GREEN, fill_opacity=1), ma.MathTex("2")
+        ).shift(2 * ma.RIGHT)
+        circle3 = ma.VGroup(
+            ma.Circle(1.0, ma.BLUE, fill_opacity=1), ma.MathTex("3")
+        ).shift(2 * ma.RIGHT)
+
+        self.play(ma.Create(circle1))
+        self.play(ma.Create(circle2))
         self.wait()
 
-        # throw them apart
-        arrow1 = ma.Arrow(ma.LEFT, ma.RIGHT, color=ma.GOLD).next_to(
-            particle1, ma.UP + 0.5 * ma.RIGHT
-        )
-        arrow2 = ma.Arrow(ma.RIGHT, ma.LEFT, color=ma.GOLD).next_to(
-            particle2, ma.UP + 0.5 * ma.LEFT
-        )
+        self.play(ma.FadeOut(circle1[1]), ma.FadeOut(circle2[1]))
 
-        self.play(
-            ma.FadeIn(arrow1),
-            arrow1.animate.shift(ma.RIGHT * 3),
-            particle1.animate.shift(ma.RIGHT * 3),
-            ma.FadeIn(arrow2),
-            arrow2.animate.shift(ma.LEFT * 3),
-            particle2.animate.shift(ma.LEFT * 3),
-        )
+        dist = ma.DoubleArrow(circle1[0].get_left(), circle1[0].get_right(), buff=0)
+        self.play(ma.FadeIn(dist))
+        self.wait()
+        self.play(ma.FadeOut(dist))
+        self.wait()
+
+        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist))
+        self.wait()
+        self.play(ma.FadeOut(dist))
+        self.wait()
+
+        self.play(circle2.animate.next_to(circle1, buff=0))
+
+        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist))
+        self.wait()
+        self.play(ma.FadeOut(dist))
+        self.wait()
+
 
         # p_1 = ma.MathTex("p_1").next_to(arrow1, ma.UP)
         # p_2 = ma.MathTex("p_2").next_to(arrow2, ma.UP)

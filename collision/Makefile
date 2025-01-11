@@ -1,9 +1,9 @@
 # Variables
 PYTHON := python3
-PIP := pip
+IP := pip
 MANIM := manim
 SCENE_FILE := scene.py
-SCENE_CLASS := Intro
+SCENE_CLASS := Collision
 OUTPUT_DIR := media
 
 # Phony targets
@@ -18,7 +18,7 @@ setup:
 
 # Render the scene for preview
 render:
-	$(MANIM) -pql $(SCENE_FILE) $(SCENE_CLASS)
+	$(MANIM) -pql $(SCENE_FILE) $(SCENE_CLASS) &> /dev/null
 
 # Clean up generated files
 clean:
