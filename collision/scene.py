@@ -50,6 +50,7 @@ class EquationsOfMotion(Scene):
 
 class Collision(Scene):
     def construct(self):
+        self.next_section(skip_animations=True)
         circle1 = ma.VGroup(
             ma.Circle(1.0, ma.RED, fill_opacity=1), ma.MathTex("1")
         ).shift(2 * ma.LEFT)
@@ -79,13 +80,42 @@ class Collision(Scene):
         self.wait()
 
         self.play(circle2.animate.next_to(circle1, buff=0))
+        self.play(ma.FadeOut(circle2[1]))
 
         dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
         self.play(ma.FadeIn(dist))
         self.wait()
-        self.play(ma.FadeOut(dist))
+        self.play(dist.animate.shift(ma.UP * 2))
         self.wait()
 
+        self.play(circle2[0].animate.next_to(circle1, buff=-0.5))
+
+        self.next_section()
+
+        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist))
+        self.wait()
+        self.play(dist.animate.shift(ma.UP * 1.5))
+        self.wait()
+
+        inter = ma.Intersection(
+            circle1[0],
+            circle2[0],
+            fill_color=ma.YELLOW,
+            stroke_color=ma.YELLOW,
+            fill_opacity=1,
+        )
+        self.play(ma.Create(inter))
+        self.wait()
+        self.play(ma.ScaleInPlace(inter, 1.5))
+        self.play(ma.ScaleInPlace(inter, 1 / 1.5))
+        self.wait()
+        self.play(ma.FadeOut(inter))
+
+        diff = inter.get_right() - inter.get_left()
+        self.play(circle2[0].animate.shift(diff / 2))
+        self.play(circle1[0].animate.shift(-diff / 2))
+        self.wait()
 
         # p_1 = ma.MathTex("p_1").next_to(arrow1, ma.UP)
         # p_2 = ma.MathTex("p_2").next_to(arrow2, ma.UP)

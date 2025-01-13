@@ -1,0 +1,55 @@
+Manim Community v0.18.1
+
+[01/11/25 17:09:17] INFO     Animation 0 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             1185818338_2727993185_21418269                     
+                             37)                                                
+Animation 0: Write(Title('خطة محاكاة التصادم')):   0%|          | 0/1 [00:00<?, ?it/s]                                                                                                          INFO     Animation 1 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1704852926_346339011                     
+                             0)                                                 
+                    INFO     Animation 2 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1223359895_417043001                     
+                             )                                                  
+Animation 2: Write(SingleStringMathTex('معادلات الحركة\\\\')):   0%|          | 0/1 [00:00<?, ?it/s]                                                                                                                        INFO     Animation 3 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1704852926_378909023                     
+                             1)                                                 
+                    INFO     Animation 4 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_4091309315_258332760                     
+                             0)                                                 
+Animation 4: Write(SingleStringMathTex('اكتشاف التصادم\\\\')):   0%|          | 0/1 [00:00<?, ?it/s]                                                                                                                        INFO     Animation 5 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1704852926_127921260                     
+                             )                                                  
+                    INFO     Animation 6 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1457185930_265481748                     
+                             0)                                                 
+Animation 6: Write(SingleStringMathTex('حل التصادم\\\\')):   0%|          | 0/1 [00:00<?, ?it/s]                                                                                                [01/11/25 17:09:18] INFO     Animation 7 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1704852926_239986685                     
+                             4)                                                 
+                    INFO     Animation 8 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1013522868_238399931                     
+                             0)                                                 
+Animation 8: Create(SurroundingRectangle):   0%|          | 0/1 [00:00<?, ?it/s]                                                                                                    INFO     Animation 9 : Using cached     cairo_renderer.py:88
+                             data (hash :                                       
+                             624642324_1704852926_264488413                     
+                             8)                                                 
+                    INFO     Combining to Movie file.   scene_file_writer.py:617
+                    INFO                                scene_file_writer.py:737
+                             File ready at                                      
+                             '/Users/ammar/projects/ani                         
+                             m/collision/media/videos/s                         
+                             cene/480p15/Intro.mp4'                             
+                                                                                
+                    INFO     Rendered Intro                         scene.py:247
+                             Played 10 animations                               
+                    INFO     Previewed File at:                  file_ops.py:231
+                             '/Users/ammar/projects/anim/collisi                
+                             on/media/videos/scene/480p15/Intro.                
+                             mp4'                                               
