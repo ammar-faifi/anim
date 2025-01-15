@@ -1,3 +1,4 @@
+from os import wait
 import manim as ma
 from manim import Scene, TexTemplate, config
 
@@ -67,35 +68,33 @@ class Collision(Scene):
 
         self.play(ma.FadeOut(circle1[1]), ma.FadeOut(circle2[1]))
 
-        dist = ma.DoubleArrow(circle1[0].get_left(), circle1[0].get_right(), buff=0)
-        self.play(ma.FadeIn(dist))
+        dist1 = ma.DoubleArrow(circle1[0].get_left(), circle1[0].get_right(), buff=0)
+        self.play(ma.FadeIn(dist1))
         self.wait()
-        self.play(ma.FadeOut(dist))
+        self.play(ma.FadeOut(dist1))
         self.wait()
 
-        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
-        self.play(ma.FadeIn(dist))
+        dist1 = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist1))
         self.wait()
-        self.play(ma.FadeOut(dist))
+        self.play(ma.FadeOut(dist1))
         self.wait()
 
         self.play(circle2.animate.next_to(circle1, buff=0))
         self.play(ma.FadeOut(circle2[1]))
 
-        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
-        self.play(ma.FadeIn(dist))
+        dist1 = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist1))
         self.wait()
-        self.play(dist.animate.shift(ma.UP * 2))
+        self.play(dist1.animate.shift(ma.UP * 2))
         self.wait()
 
         self.play(circle2[0].animate.next_to(circle1, buff=-0.5))
 
-        self.next_section()
-
-        dist = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
-        self.play(ma.FadeIn(dist))
+        dist2 = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
+        self.play(ma.FadeIn(dist2))
         self.wait()
-        self.play(dist.animate.shift(ma.UP * 1.5))
+        self.play(dist2.animate.shift(ma.UP * 1.5))
         self.wait()
 
         inter = ma.Intersection(
@@ -115,7 +114,18 @@ class Collision(Scene):
         diff = inter.get_right() - inter.get_left()
         self.play(circle2[0].animate.shift(diff / 2))
         self.play(circle1[0].animate.shift(-diff / 2))
+        self.play(ma.FadeOut(dist2))
+        self.play(ma.FadeOut(dist1))
         self.wait()
+
+        mid_point_up = (circle1[0].get_center() + circle2[0].get_center()) / 2
+        mid_point_up = mid_point_up + ma.UP*1.5
+        circle3.move_to(mid_point_up)
+        self.play(ma.Create(circle3))
+        self.wait()
+
+        self.next_section()
+
 
         # p_1 = ma.MathTex("p_1").next_to(arrow1, ma.UP)
         # p_2 = ma.MathTex("p_2").next_to(arrow2, ma.UP)
