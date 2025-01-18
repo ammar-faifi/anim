@@ -1,4 +1,4 @@
-from os import wait
+from manim import *
 import manim as ma
 from manim import Scene, TexTemplate, config
 
@@ -10,6 +10,7 @@ AR_PREAMBLE = r"""
 
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{kpfonts}
 """
 
 config.tex_template = TexTemplate(preamble=AR_PREAMBLE)
@@ -51,15 +52,16 @@ class EquationsOfMotion(Scene):
 
 class Collision(Scene):
     def construct(self):
-        self.next_section(skip_animations=True)
+        RADIUS = 1.0
+
         circle1 = ma.VGroup(
-            ma.Circle(1.0, ma.RED, fill_opacity=1), ma.MathTex("1")
+            ma.Circle(RADIUS, ma.RED, fill_opacity=1), ma.MathTex("1")
         ).shift(2 * ma.LEFT)
         circle2 = ma.VGroup(
-            ma.Circle(1.0, ma.GREEN, fill_opacity=1), ma.MathTex("2")
+            ma.Circle(RADIUS, ma.GREEN, fill_opacity=1), ma.MathTex("2")
         ).shift(2 * ma.RIGHT)
         circle3 = ma.VGroup(
-            ma.Circle(1.0, ma.BLUE, fill_opacity=1), ma.MathTex("3")
+            ma.Circle(RADIUS, ma.BLUE, fill_opacity=1), ma.MathTex("3")
         ).shift(2 * ma.RIGHT)
 
         self.play(ma.Create(circle1))
@@ -119,13 +121,63 @@ class Collision(Scene):
         self.wait()
 
         mid_point_up = (circle1[0].get_center() + circle2[0].get_center()) / 2
-        mid_point_up = mid_point_up + ma.UP*1.5
+        mid_point_up = mid_point_up + ma.UP * 1.5
         circle3.move_to(mid_point_up)
         self.play(ma.Create(circle3))
         self.wait()
 
-        self.next_section()
+        self.play(ma.FadeOut(circle3[1]))
 
+        v1 = circle1[0].get_center()
+        v2 = circle2[0].get_center()
+        v3 = circle3[0].get_center()
+
+        def displacement(p1, p2, r=RADIUS):
+            overlap = 2 * r - np.linalg.norm(p2 - p1)
+            return overlap * (p2 - p1) / 3.5
+
+        self.play(circle3[0].animate.shift(displacement(v1, v3)))
+        self.play(circle1[0].animate.shift(-displacement(v1, v3)))
+
+        self.play(circle3[0].animate.shift(displacement(v2, v3)))
+        self.play(circle2[0].animate.shift(-displacement(v2, v3)))
+
+        EQ_REF = RIGHT * 4 + UP
+
+        calc_text = Tex("حساب التداخل", color=BLUE).move_to(EQ_REF + UP)
+        self.play(Write(calc_text, reverse=True, remover=False))
+
+        dist_eq = MathTex(r"2 r - |\vec{v_2} - \vec{v_1}|").move_to(EQ_REF)
+        dist_eq_1 = MathTex(r"d").move_to(EQ_REF)
+
+        self.play(Write(dist_eq))
+        self.wait()
+        self.play(Transform(dist_eq[0][-9:], dist_eq_1))
+        self.wait()
+
+        dist_ineq = MathTex(r"2r - d > 0").move_to(EQ_REF + DOWN)
+        self.play(Write(dist_ineq))
+        self.wait()
+
+        dis_vec = MathTex(
+            r"\vec{a}",
+            r"=",
+            r"\frac{2r-d}{2}",
+            r"\cdot",
+            r"\frac{\vec{v_2} - \vec{v_1}}{d}",
+        ).move_to(EQ_REF + DOWN * 2)
+        self.play(Write(dis_vec))
+
+        self.wait()
+        surr = SurroundingRectangle(dis_vec[2])
+        self.play(Create(surr))
+        self.wait()
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[3])))
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[4])))
+        self.wait()
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[0])))
+
+        self.wait()
 
         # p_1 = ma.MathTex("p_1").next_to(arrow1, ma.UP)
         # p_2 = ma.MathTex("p_2").next_to(arrow2, ma.UP)
