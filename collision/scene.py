@@ -85,6 +85,43 @@ class Collision(Scene):
         self.play(circle2.animate.next_to(circle1, buff=0))
         self.play(ma.FadeOut(circle2[1]))
 
+        EQ_REF = RIGHT * 4 + UP
+
+        calc_text = Tex("حساب التداخل", color=BLUE).move_to(EQ_REF + UP)
+        self.play(Write(calc_text, reverse=True, remover=False))
+
+        dist_eq = MathTex(r"2 r - |\vec{v_2} - \vec{v_1}|").move_to(EQ_REF)
+        dist_eq_1 = MathTex(r"d").move_to(EQ_REF)
+
+        self.play(Write(dist_eq))
+        self.wait()
+        self.play(Transform(dist_eq[0][-9:], dist_eq_1))
+        self.wait()
+
+        dist_ineq = MathTex(r"2r - d > 0").move_to(EQ_REF + DOWN)
+        self.play(Write(dist_ineq))
+        self.wait()
+
+        dis_vec = MathTex(
+            r"\vec{a}",
+            r"=",
+            r"\frac{2r-d}{2}",
+            r"\cdot",
+            r"\frac{\vec{v_2} - \vec{v_1}}{d}",
+        ).move_to(EQ_REF + DOWN * 2)
+        self.play(Write(dis_vec))
+
+        self.wait()
+        surr = SurroundingRectangle(dis_vec[2])
+        self.play(Create(surr))
+        self.wait()
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[3])))
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[4])))
+        self.wait()
+        self.play(Transform(surr, SurroundingRectangle(dis_vec[0])))
+        self.wait()
+        self.play(FadeOut(surr))
+
         dist1 = ma.DoubleArrow(circle1[0].get_center(), circle2[0].get_center(), buff=0)
         self.play(ma.FadeIn(dist1))
         self.wait()
@@ -141,41 +178,6 @@ class Collision(Scene):
 
         self.play(circle3[0].animate.shift(displacement(v2, v3)))
         self.play(circle2[0].animate.shift(-displacement(v2, v3)))
-
-        EQ_REF = RIGHT * 4 + UP
-
-        calc_text = Tex("حساب التداخل", color=BLUE).move_to(EQ_REF + UP)
-        self.play(Write(calc_text, reverse=True, remover=False))
-
-        dist_eq = MathTex(r"2 r - |\vec{v_2} - \vec{v_1}|").move_to(EQ_REF)
-        dist_eq_1 = MathTex(r"d").move_to(EQ_REF)
-
-        self.play(Write(dist_eq))
-        self.wait()
-        self.play(Transform(dist_eq[0][-9:], dist_eq_1))
-        self.wait()
-
-        dist_ineq = MathTex(r"2r - d > 0").move_to(EQ_REF + DOWN)
-        self.play(Write(dist_ineq))
-        self.wait()
-
-        dis_vec = MathTex(
-            r"\vec{a}",
-            r"=",
-            r"\frac{2r-d}{2}",
-            r"\cdot",
-            r"\frac{\vec{v_2} - \vec{v_1}}{d}",
-        ).move_to(EQ_REF + DOWN * 2)
-        self.play(Write(dis_vec))
-
-        self.wait()
-        surr = SurroundingRectangle(dis_vec[2])
-        self.play(Create(surr))
-        self.wait()
-        self.play(Transform(surr, SurroundingRectangle(dis_vec[3])))
-        self.play(Transform(surr, SurroundingRectangle(dis_vec[4])))
-        self.wait()
-        self.play(Transform(surr, SurroundingRectangle(dis_vec[0])))
 
         self.wait()
 
