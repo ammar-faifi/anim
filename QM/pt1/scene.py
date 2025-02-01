@@ -1,4 +1,5 @@
-import gettext import os
+import gettext
+from pathlib import Path
 
 from manim import *
 
@@ -15,25 +16,32 @@ AR_PREAMBLE = r"""
 config.tex_template = TexTemplate(preamble=AR_PREAMBLE)
 
 
-# Setup translatoin with its domain
-languages = ["ar"]
-localedir = os.path.join(os.path.abspath(os.path.dirname(__file__)), "locale")
-translate = gettext.translation("messages", localedir, languages, fallback=True)
-_ = translate.gettext
+# Setup translation with its domain
+languages = ['en']
+localedir = Path(__file__).parent / "locale"
+t = gettext.translation("messages", localedir, languages, fallback=True)
+_ = t.gettext
 # right to left lang ?
 IS_RTL = True
 
 
 class Introduction(Scene):
     """
-    Points to mention:
+    # Points to mention:
         - black body
             - what is the problem
             - what was the solution
+            - Rayleigh–Jeans law
         - how is this trigger the idea of qunta
         - Eienstin's naming photons
         - Later, Hydrogen atom's qunatization of its energy level
         - Bohr's role
+
+    # Visuals:
+        - A black body cavity radiating
+        - plot raylegh-Jean for different temp
+        - show the infinite dillema
+        - show the law's equation
     """
 
     def construct(self):
@@ -44,13 +52,15 @@ class Introduction(Scene):
         self.play(Write(title, reverse=True, remover=False))
         self.play(Transform(title, sub_title))
 
-        paul_portrait = ImageMobject("./Paul_Ehrenfest.jpg")
+        paul_portrait = ImageMobject("./figures/Paul_Ehrenfest.jpg")
         paul_name = Text(_("Paul Ehrenfest")).next_to(paul_portrait, DOWN)
         self.play(FadeIn(paul_portrait))
         self.wait()
-        self.play(Write(paul_name, reverse=IS_RTL, remover=not IS_RTL))
+        self.play(Write(paul_name, reverse=IS_RTL, remover=False))
         self.play(FadeOut(paul_portrait), Uncreate(paul_name))
         self.wait()
+
+        self.play(Transform(title, Title(_("First Man"))))
 
 
 class RayleighJeansCatastrophe(Scene):
