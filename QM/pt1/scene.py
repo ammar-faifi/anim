@@ -3,6 +3,8 @@ from pathlib import Path
 
 from manim import *
 
+# from manimlib import *
+
 AR_PREAMBLE = r"""
 \usepackage[utf8]{inputenc}
 \usepackage{arabtex}
@@ -13,16 +15,50 @@ AR_PREAMBLE = r"""
 \usepackage{kpfonts}
 """
 
-config.tex_template = TexTemplate(preamble=AR_PREAMBLE)
-
 
 # Setup translation with its domain
-languages = ['en']
+languages = ["ar"]
 localedir = Path(__file__).parent / "locale"
 t = gettext.translation("messages", localedir, languages, fallback=True)
 _ = t.gettext
 # right to left lang ?
 IS_RTL = True
+
+# For Arabic LaTeX
+# config.tex_template = TexTemplate(preamble=AR_PREAMBLE)
+config.background_color = GRAY_E
+
+
+def create_square_glow(vmobject, length: float = 1, color=YELLOW):
+    glow_group = VGroup()
+
+    for idx in range(60):
+        glow_group.add(
+            Cube(
+                length * (1.01**idx),
+                stroke_opacity=0,
+                fill_color=color,
+                fill_opacity=0.2 - idx / 300,
+            ).move_to(vmobject)
+        )
+
+    return glow_group
+
+
+def create_glow(vmobject, rad=1, col=YELLOW):
+    glow_group = VGroup()
+
+    for idx in range(60):
+        glow_group.add(
+            Circle(
+                radius=rad * (1.002 ** (idx**2)) / 400,
+                stroke_opacity=0,
+                fill_color=col,
+                fill_opacity=0.2 - idx / 300,
+            ).move_to(vmobject)
+        )
+
+    return glow_group
 
 
 class Introduction(Scene):
@@ -45,6 +81,7 @@ class Introduction(Scene):
     """
 
     def construct(self):
+        # self.next_section(skip_animations=True)
 
         title = Title(_("How was Quantum Physics started?"))
         sub_title = Title(_("Ultraviolet catastrophe"))
@@ -61,6 +98,13 @@ class Introduction(Scene):
         self.wait()
 
         self.play(Transform(title, Title(_("First Man"))))
+
+        # self.next_section()
+        circ = Circle(0.1, fill_opacity=1)
+        glow = create_glow(circ, 2)
+        self.add(circ, glow)
+
+        self.wait()
 
 
 class RayleighJeansCatastrophe(Scene):
@@ -83,14 +127,15 @@ class RayleighJeansCatastrophe(Scene):
                 "numbers_with_elongated_ticks": np.arange(0, 6e13, 1e13),
             },
             tips=False,
-        )
+        ).scale(0.7).shift(DOWN)
 
         # Labels
-        x_label = axes.get_x_axis_label("Wavelength (m)")
+        x_label = axes.get_x_axis_label(r"\lambda (m)")
         y_label = axes.get_y_axis_label(
             r"Spectral Radiance\\(W\cdot sr^{-1}\cdot m^{-3})"
         )
         labels = VGroup(x_label, y_label)
+        labels.scale(0.5)
 
         # Title
         title = Text("Rayleigh-Jeans Catastrophe", font_size=40)
@@ -98,17 +143,18 @@ class RayleighJeansCatastrophe(Scene):
 
         # Visible spectrum range (380nm to 750nm)
         visible_range = Rectangle(
-            width=axes.x_axis.unit_size * (750e-9 - 380e-9), height=6, fill_opacity=0.3
+            width=axes.x_axis.unit_size * (750e-9 - 380e-9),
+            height=4,
+            fill_opacity=0.8,
+            stroke_width=0,
         )
         visible_range.move_to(
-            axes.c2p((380e-9 + 750e-9) / 2, 2.5e13, 0), aligned_edge=ORIGIN
+            axes.c2p((380e-9 + 750e-9) / 2, 0, 0), aligned_edge=DOWN
         )
-
-        # Create gradient for visible spectrum
         colors = [PURPLE, BLUE, GREEN, YELLOW, RED]
-        visible_range.set_color_by_gradient(*colors)
+        visible_range.set_color_by_gradient(colors)
+        visible_range.set_sheen_direction(RIGHT)
 
-        # Function to calculate Rayleigh-Jeans spectral radiance
         def rayleigh_jeans(wavelength, temperature):
             return (2 * c * k_B * temperature) / (wavelength**4)
 
@@ -143,8 +189,86 @@ class RayleighJeansCatastrophe(Scene):
         self.play(FadeIn(visible_range), Write(visible_label))
         self.wait()
 
-        for graph, label in zip(graphs, temp_labels):
-            self.play(Create(graph), Write(label), run_time=1.5)
+        # for graph, label in zip(graphs, temp_labels):
+        #     self.play(Create(graph), Write(label), run_time=1.5)
+        #     self.wait(0.5)
+        #
+        self.wait(2)
+
+
+# Alternative version with temperature visualization
+class BlackBodyWithTemperature(ThreeDScene):
+    def construct(self):
+        # Create the black body cube
+        cube = Cube(
+            side_length=2.5,
+            fill_color=BLACK,
+            fill_opacity=0.95,
+            stroke_color=DARK_GRAY,
+            stroke_width=1,
+            stroke_opacity=0.4,
+        )
+        cube.set_shade_in_3d(True)
+
+        # Create a subtle glow effect around the cube
+        glow_cube = Cube(
+            side_length=2.6, fill_color=RED, fill_opacity=0.1, stroke_width=0
+        )
+        glow_cube = create_square_glow(cube, 1.7)
+
+        # Group cube and glow
+        black_body = VGroup(glow_cube, cube)
+
+        # Title and labels
+        title = Text("Black Body at Different Temperatures", font_size=36, color=WHITE)
+        title.to_edge(UP, buff=0.5)
+
+        # Temperature indicator
+        temp_text = Text("Temperature: ", font_size=28, color=WHITE)
+        temp_value = Text("1000 K", font_size=28, color=YELLOW)
+        temp_group = VGroup(temp_text, temp_value)
+        temp_group.arrange(RIGHT, buff=0.2)
+        temp_group.to_edge(DOWN, buff=1)
+
+        # Set 3D camera
+        # self.set_camera_orientation(phi=70 * DEGREES, theta=45 * DEGREES)
+
+        # Animations
+        self.play(Write(title), run_time=1.5)
+        self.play(FadeIn(black_body[1]), Write(temp_group))
+        self.play(FadeIn(black_body[0]))
+
+        state = self.camera.get_phi(), self.camera.get_theta()
+        self.move_camera(phi=45 * DEGREES, theta=-50 * DEGREES)
+        self.wait(1)
+
+        # Final rotation
+        self.play(Rotate(black_body), run_time=3)
+
+        # Simulate temperature changes with color shifts
+        temperatures = [1000, 2000, 3000, 5000, 8000]
+        colors = [0xFF0017, 0xFF7C00, 0xCEB04D, 0x83B28D, 0x3DA8AD]
+
+        for temp, color in zip(temperatures[1:], colors[1:]):
+            new_temp_value = Text(f"{temp} K", font_size=28, color=color)
+            new_temp_value.move_to(temp_value.get_center())
+
+            new_glow_cube = Cube(
+                side_length=2.6, fill_color=color, fill_opacity=0.15, stroke_width=0
+            )
+            new_glow_cube = create_square_glow(cube, color=color)
+            new_glow_cube.move_to(glow_cube.get_center())
+
+            self.play(
+                Transform(temp_value, new_temp_value),
+                black_body[0].animate.set_color(color),
+                run_time=1.5,
+            )
             self.wait(0.5)
 
         self.wait(2)
+
+        # self.move_camera(phi=-45 * DEGREES, theta=50 * DEGREES)
+        self.move_camera(*state)
+        self.camera
+        self.wait(1)
