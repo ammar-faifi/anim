@@ -281,12 +281,12 @@ class Introduction(ThreeDScene):
                 y_range=[0, 20, 2],
                 axis_config={"color": WHITE},
                 x_axis_config={
-                    "numbers_to_include": np.arange(0, 3001, 500),
-                    "numbers_with_elongated_ticks": np.arange(0, 3001, 500),
+                    "numbers_to_include": [0, 3000, 100],
+                    "numbers_with_elongated_ticks": [0, 3000, 100],
                 },
                 y_axis_config={
-                    "numbers_to_include": np.arange(0, 21, 4),
-                    "numbers_with_elongated_ticks": np.arange(0, 20, 4),
+                    "numbers_to_include": [0, 20, 2],
+                    "numbers_with_elongated_ticks": [0, 20, 2],
                 },
                 tips=False,
             )
@@ -295,7 +295,7 @@ class Introduction(ThreeDScene):
         )
 
         # Labels
-        x_label = axes.get_x_axis_label(r"\lambda [nm]")
+        x_label = axes.get_x_axis_label(r"\lambda [m]")
         y_label = axes.get_y_axis_label(
             r"Spectral Radiance\\(kW\cdot sr^{-1}\cdot m^{-3})"
         )
@@ -337,40 +337,22 @@ class Introduction(ThreeDScene):
             temp_labels.add(temp_label)
 
         # Visible spectrum label
-        visible_label = Text(_("Visible Spectrum"), font_size=14)
+        visible_label = Text(_("Visible Spectrum"), font_size=24)
         visible_label.next_to(visible_range, UP)
-
-        visible_brace = Brace(visible_range, buff=0.3)
-        visible_brace.put_at_tip(visible_label)
-        self.add(visible_brace)
-
-        ir_range = Rectangle(
-            width=(axes.c2p(3000) - visible_range.get_right())[0],
-            height=4,
-            fill_opacity=0.1,
-            stroke_width=0,
-        ).next_to(visible_range, RIGHT, buff=0)
-        uv_range = Rectangle(
-            width=(visible_range.get_left() - axes.c2p(0))[0],
-            height=4,
-            fill_opacity=0.1,
-            stroke_width=0,
-        ).next_to(visible_range, LEFT, buff=0)
-
-        self.next_section()
 
         # Create the black body cube
         cube = Cube(
             side_length=2,
             fill_color=BLACK,
-            fill_opacity=0.65,
+            fill_opacity=0.75,
             stroke_color=DARK_GRAY,
             stroke_width=1,
             stroke_opacity=1,
         )
         cube.set_shade_in_3d(True)
-        glow_cube = create_square_glow(cube, 2).set_z_index(-2)
-        black_body = VGroup(glow_cube, cube).to_edge(LEFT).rotate(PI / 2, RIGHT)
+        glow_cube = create_square_glow(cube, 2).set_z_index(100)
+        black_body = VGroup(glow_cube, cube).to_edge(LEFT)
+        # black_body.rotate(PI / 2, RIGHT)
 
         # Animation sequence
         self.play(Create(axes), Write(labels))
@@ -379,40 +361,33 @@ class Introduction(ThreeDScene):
         self.play(FadeIn(visible_range), Write(visible_label))
         self.wait()
 
-        self.add(ir_range, uv_range)
-        self.play(Indicate(ir_range, 1.1))
-        self.play(Indicate(uv_range, 1.1))
-        self.play(FadeOut(ir_range), FadeOut(uv_range))
-
         for graph, label in zip(graphs, temp_labels):
             self.play(Create(graph), Write(label), run_time=1.5)
             self.wait(0.5)
 
         # Simulate temperature changes with color shifts
-        temperatures = [2000, 3000, 4000, 4500, 5500]
+        temperatures = [1000, 2000, 3000, 4000, 5500]
         colors = ["#FF0017", "#FF7C00", "#CEB04D", "#83B28D", "#3DA8AD"]
 
+        self.next_section()
 
         graph = axes.plot(partial(planck_function_nm, temperature=1000))
         self.add(axes, graph)
 
-        # Temperature indicator
-        temp_value = Text("2000 K", font_size=28, color=YELLOW)
-        temp_value.move_to(black_body, DOWN).shift(DOWN)
-
         self.play(FadeIn(black_body[1]))
-        self.play(Rotate(black_body[1], axis=UP), run_time=4)
-
         self.play(FadeIn(black_body[0]))
-        self.play(FadeIn(temp_value))
-        self.play(Indicate(temp_value))
+        # self.play(Rotate(black_body, axis=UP), run_time=4)
 
         for temp, color in zip(temperatures[1:], colors[1:]):
             new_temp_value = Text(f"{temp} K", font_size=28, color=color)
-            new_temp_value.move_to(temp_value.get_center())
+            # new_temp_value.move_to(temp_value.get_center())
+
+            # new_glow_cube = create_square_glow(cube, 2.01, color=color)
+            # new_glow_cube.move_to(glow_cube.get_center())
 
             self.play(
-                Transform(temp_value, new_temp_value),
+                # Transform(temp_value, new_temp_value),
+                # Transform(black_body[0], new_glow_cube),
                 Transform(
                     graph, axes.plot(partial(planck_function_nm, temperature=temp))
                 ),
@@ -420,6 +395,7 @@ class Introduction(ThreeDScene):
                 run_time=1.5,
             )
             self.wait(0.5)
+            black_body[0].set_z_index(100)
 
         self.wait(2)
 
