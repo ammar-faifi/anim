@@ -133,27 +133,6 @@ def planck_function_nm(wavelength_nm, temperature, scale_factor=1e-12):
     return planck_spectral_radiance_normalized(wavelength_m, temperature, scale_factor)
 
 
-def wien_displacement_law(temperature):
-    """
-    Calculate peak wavelength using Wien's displacement law.
-
-    λ_max = b / T, where b = 2.897771955×10⁻³ m⋅K
-
-    Parameters:
-    -----------
-    temperature : float
-        Temperature in Kelvin
-
-    Returns:
-    --------
-    tuple : (peak_wavelength_m, peak_wavelength_nm)
-    """
-    wien_constant = 2.897771955e-3  # Wien's displacement constant (m⋅K)
-    peak_wavelength_m = wien_constant / temperature
-    peak_wavelength_nm = peak_wavelength_m * 1e9
-    return peak_wavelength_m, peak_wavelength_nm
-
-
 def stefan_boltzmann_law(temperature):
     """
     Calculate total radiated power using Stefan-Boltzmann law.
@@ -191,7 +170,7 @@ def get_wavelength_array(wavelength_range_nm=(200, 3000), num_points=1000):
     return np.linspace(wavelength_range_nm[0], wavelength_range_nm[1], num_points)
 
 
-def find_wien_displacement_peak(temperature):
+def wien_displacement(temperature):
     """
     Find the wavelength of maximum emission using Wien's displacement law.
 
@@ -278,34 +257,42 @@ class Introduction(ThreeDScene):
         axes = (
             Axes(
                 x_range=[1, 3000, 100],
-                y_range=[0, 20, 2],
-                axis_config={"color": WHITE},
+                y_range=[0, 25, 2],
+                axis_config={"color": BLUE},
                 x_axis_config={
                     "numbers_to_include": np.arange(0, 3001, 500),
                     "numbers_with_elongated_ticks": np.arange(0, 3001, 500),
                 },
                 y_axis_config={
-                    "numbers_to_include": np.arange(0, 21, 4),
-                    "numbers_with_elongated_ticks": np.arange(0, 20, 4),
+                    "numbers_to_include": np.arange(0, 25, 4),
+                    "numbers_with_elongated_ticks": np.arange(0, 25, 4),
                 },
                 tips=False,
             )
-            .scale(0.6)
-            .shift(DOWN + RIGHT)
+            .scale(0.75)
+            .to_edge(RIGHT)
         )
 
         # Labels
-        x_label = axes.get_x_axis_label(r"\lambda [nm]")
-        y_label = axes.get_y_axis_label(
-            r"Spectral Radiance\\(kW\cdot sr^{-1}\cdot m^{-3})"
+        y_label_m = MathTex(
+            r"Spectral Radiance\\",
+            r"(",
+            "kW",
+            r"\cdot",
+            "sr^{-1}",
+            r"\cdot",
+            "m^{-3}",
+            ")",
         )
+        x_label = axes.get_x_axis_label(r"\lambda (nm)")
+        y_label = axes.get_y_axis_label(y_label_m)
         labels = VGroup(x_label, y_label)
         labels.scale(0.5)
 
         # Visible spectrum range (380nm to 750nm)
         visible_range = Rectangle(
-            width=axes.x_axis.unit_size * (750 - 380),
-            height=4,
+            width=axes.get_x_unit_size() * (750 - 380),
+            height=axes.get_y_unit_size() * 25,
             fill_opacity=0.7,
             stroke_width=0,
         )
@@ -314,50 +301,25 @@ class Introduction(ThreeDScene):
         visible_range.set_color_by_gradient(colors)
         visible_range.set_sheen_direction(RIGHT)
 
-        # Create graphs for different temperatures
-        temperatures = [3000, 4000, 5000]
-        graphs = VGroup()
-        temp_labels = VGroup()
-
-        for temp in temperatures:
-            wavelengths = np.linspace(1100e-9, 3000e-9, 100)
-            spectral_radiance = [rayleigh_jeans(w, temp) for w in wavelengths]
-
-            graph = axes.plot_line_graph(
-                x_values=wavelengths * 1e9,
-                y_values=spectral_radiance,
-                line_color=BLUE,
-                add_vertex_dots=False,
-            )
-
-            temp_label = Text(f"{temp}K", font_size=24, color=BLUE_A)
-            temp_label.next_to(graph, RIGHT)
-
-            graphs.add(graph)
-            temp_labels.add(temp_label)
-
         # Visible spectrum label
         visible_label = Text(_("Visible Spectrum"), font_size=14)
         visible_label.next_to(visible_range, UP)
 
-        visible_brace = Brace(visible_range, buff=0.3)
+        visible_brace = Brace(visible_range, buff=0.4)
         visible_brace.put_at_tip(visible_label)
-        self.add(visible_brace)
 
         ir_range = Rectangle(
             width=(axes.c2p(3000) - visible_range.get_right())[0],
-            height=4,
+            height=axes.get_y_unit_size() * 25,
             fill_opacity=0.1,
             stroke_width=0,
         ).next_to(visible_range, RIGHT, buff=0)
         uv_range = Rectangle(
             width=(visible_range.get_left() - axes.c2p(0))[0],
-            height=4,
+            height=axes.get_y_unit_size() * 25,
             fill_opacity=0.1,
             stroke_width=0,
         ).next_to(visible_range, LEFT, buff=0)
-
-        self.next_section()
 
         # Create the black body cube
         cube = Cube(
@@ -372,40 +334,54 @@ class Introduction(ThreeDScene):
         glow_cube = create_square_glow(cube, 2).set_z_index(-2)
         black_body = VGroup(glow_cube, cube).to_edge(LEFT).rotate(PI / 2, RIGHT)
 
-        # Animation sequence
+        #### Animation sequence ####
+
+        # Show axes
         self.play(Create(axes), Write(labels))
         self.wait()
 
+        # Highlight units
+        surr = SurroundingRectangle(y_label[2])
+        self.play(Create(surr))
+        self.play(Transform(surr, SurroundingRectangle(y_label[4])))
+        self.play(Transform(surr, SurroundingRectangle(y_label[6])))
+        self.play(Uncreate(surr))
+        surr = SurroundingRectangle(x_label)
+        self.play(Create(surr))
+        self.play(Uncreate(surr))
+        self.play(FadeOut(labels))
+
+        # Show the visible range
+        self.play(Create(visible_brace))
         self.play(FadeIn(visible_range), Write(visible_label))
         self.wait()
 
-        self.add(ir_range, uv_range)
+        # Show the IR and UV ranges
+        self.play(FadeIn(ir_range))
         self.play(Indicate(ir_range, 1.1))
+        self.play(FadeOut(ir_range))
+        self.play(FadeIn(uv_range))
         self.play(Indicate(uv_range, 1.1))
-        self.play(FadeOut(ir_range), FadeOut(uv_range))
-
-        for graph, label in zip(graphs, temp_labels):
-            self.play(Create(graph), Write(label), run_time=1.5)
-            self.wait(0.5)
+        self.play(FadeOut(uv_range))
 
         # Simulate temperature changes with color shifts
-        temperatures = [2000, 3000, 4000, 4500, 5500]
-        colors = ["#FF0017", "#FF7C00", "#CEB04D", "#83B28D", "#3DA8AD"]
+        temperatures = [2000, 3000, 4000, 5000, 5500]
+        colors = [0xFF0017, 0xFF7C00, 0xCEB04D, 0x83B28D, 0x3DA8AD]
 
-
-        graph = axes.plot(partial(planck_function_nm, temperature=1000))
-        self.add(axes, graph)
-
-        # Temperature indicator
-        temp_value = Text("2000 K", font_size=28, color=YELLOW)
-        temp_value.move_to(black_body, DOWN).shift(DOWN)
-
+        # Introduce the black body visuals
         self.play(FadeIn(black_body[1]))
         self.play(Rotate(black_body[1], axis=UP), run_time=4)
 
+        # Temperature indicator
+        temp_value = Text("1000 K", font_size=28, color=colors[0])
+        temp_value.next_to(black_body, DOWN)
         self.play(FadeIn(black_body[0]))
         self.play(FadeIn(temp_value))
         self.play(Indicate(temp_value))
+
+        # Plot first Plank curve
+        graph = axes.plot(partial(planck_function_nm, temperature=colors[0]))
+        self.play(Create(graph))
 
         for temp, color in zip(temperatures[1:], colors[1:]):
             new_temp_value = Text(f"{temp} K", font_size=28, color=color)
@@ -421,165 +397,379 @@ class Introduction(ThreeDScene):
             )
             self.wait(0.5)
 
-        self.wait(2)
-
-
-class RayleighJeansCatastrophe(Scene):
-    def construct(self):
-        axes = (
-            Axes(
-                x_range=[0, 3e-6, 0.5e-6],
-                y_range=[0, 5e13, 1e13],
-                axis_config={"color": WHITE},
-                x_axis_config={
-                    "numbers_to_include": np.arange(0, 3.5e-6, 0.5e-6),
-                    "numbers_with_elongated_ticks": np.arange(0, 3.5e-6, 0.5e-6),
-                },
-                # y_axis_config={
-                #     "numbers_to_include": np.arange(0, 6e13, 1e13),
-                #     "numbers_with_elongated_ticks": np.arange(0, 6e13, 1e13),
-                # },
-                tips=False,
+        # Show Wien's law equation
+        wien_label = (
+            Text(_("Wien's Law")).next_to(temp_value, DOWN, buff=0.5).scale(0.8)
+        )
+        wien_eq = (
+            MathTex(r"\lambda_p", "=", r"\frac{b}{T}").move_to(wien_label).scale(0.6)
+        )
+        wien_eq_const = (
+            MathTex(
+                r"\lambda",
+                r"\approx",
+                r"\frac{2.89 \times 10^{-3} \text{m} \cdot \text{K}}{T}",
             )
-            .scale(0.7)
-            .shift(DOWN)
+            .move_to(wien_eq)
+            .scale(0.6)
         )
+        self.play(Write(wien_label))
+        self.play(Unwrite(wien_label))
+        self.play(Write(wien_eq))
+        self.play(Circumscribe(wien_eq[0]))
+        self.play(Circumscribe(wien_eq[2][0]))
+        self.play(Circumscribe(wien_eq[2][2]))
+        tmp = wien_eq.copy()
+        self.play(Transform(wien_eq, wien_eq_const))
+        self.play(Transform(wien_eq, tmp))
 
-        # Labels
-        x_label = axes.get_x_axis_label(r"\lambda (m)")
-        y_label = axes.get_y_axis_label(
-            r"Spectral Radiance\\(W\cdot sr^{-1}\cdot m^{-3})"
-        )
-        labels = VGroup(x_label, y_label)
-        labels.scale(0.5)
-
-        # Title
-        title = Text("Rayleigh-Jeans Catastrophe", font_size=40)
-        title.to_edge(UP)
-
-        # Visible spectrum range (380nm to 750nm)
-        visible_range = Rectangle(
-            width=axes.x_axis.unit_size * (750e-9 - 380e-9),
-            height=4,
-            fill_opacity=0.8,
-            stroke_width=0,
-        )
-        visible_range.move_to(axes.c2p((380e-9 + 750e-9) / 2, 0, 0), aligned_edge=DOWN)
-        colors = [PURPLE, BLUE, GREEN, YELLOW, RED]
-        visible_range.set_color_by_gradient(colors)
-        visible_range.set_sheen_direction(RIGHT)
-
-        # Create graphs for different temperatures
-        temperatures = [3000, 4000, 5000]
-        graphs = VGroup()
-        temp_labels = VGroup()
-
-        for i, temp in enumerate(temperatures):
-            wavelengths = np.linspace(1e-7, 3e-6, 1000)
-            spectral_radiance = [rayleigh_jeans(w, temp) for w in wavelengths]
-
-            graph = axes.plot_line_graph(
-                x_values=wavelengths, y_values=spectral_radiance, line_color=BLUE
-            )
-
-            temp_label = Text(f"{temp}K", font_size=24, color=BLUE_A)
-            temp_label.next_to(graph, RIGHT)
-
-            graphs.add(graph)
-            temp_labels.add(temp_label)
-
-        # Visible spectrum label
-        visible_label = Text("Visible Spectrum", font_size=24)
-        visible_label.next_to(visible_range, UP)
-
-        # Animation sequence
-        self.play(Write(title))
-        self.play(Create(axes), Write(labels))
-        self.wait()
-
-        self.play(FadeIn(visible_range), Write(visible_label))
-        self.wait()
-
-        # for graph, label in zip(graphs, temp_labels):
-        #     self.play(Create(graph), Write(label), run_time=1.5)
-        #     self.wait(0.5)
-        #
-        self.wait(2)
-
-
-# Alternative version with temperature visualization
-class BlackBodyWithTemperature(ThreeDScene):
-    def construct(self):
-        # Create the black body cube
-        cube = Cube(
-            side_length=2.5,
-            fill_color=BLACK,
-            fill_opacity=0.95,
-            stroke_color=DARK_GRAY,
-            stroke_width=1,
-            stroke_opacity=0.4,
-        )
-        cube.set_shade_in_3d(True)
-
-        # Create a subtle glow effect around the cube
-        glow_cube = Cube(
-            side_length=2.6, fill_color=RED, fill_opacity=0.1, stroke_width=0
-        )
-        glow_cube = create_square_glow(cube, 1.7)
-
-        # Group cube and glow
-        black_body = VGroup(glow_cube, cube)
-
-        # Title and labels
-        title = Text("Black Body at Different Temperatures", font_size=36, color=WHITE)
-        title.to_edge(UP, buff=0.5)
-
-        # Temperature indicator
-        temp_text = Text("Temperature: ", font_size=28, color=WHITE)
-        temp_value = Text("1000 K", font_size=28, color=YELLOW)
-        temp_group = VGroup(temp_text, temp_value)
-        temp_group.arrange(RIGHT, buff=0.2)
-        temp_group.to_edge(DOWN, buff=1)
-
-        # Set 3D camera
-        # self.set_camera_orientation(phi=70 * DEGREES, theta=45 * DEGREES)
-
-        # Animations
-        self.play(Write(title), run_time=1.5)
-        self.play(FadeIn(black_body[1]), Write(temp_group))
-        self.play(FadeIn(black_body[0]))
-
-        state = self.camera.get_phi(), self.camera.get_theta()
-        self.move_camera(phi=45 * DEGREES, theta=-50 * DEGREES)
-        self.wait(1)
-
-        # Final rotation
-        self.play(Rotate(black_body), run_time=3)
-
-        # Simulate temperature changes with color shifts
-        temperatures = [1000, 2000, 3000, 5000, 8000]
-        colors = [0xFF0017, 0xFF7C00, 0xCEB04D, 0x83B28D, 0x3DA8AD]
-
-        for temp, color in zip(temperatures[1:], colors[1:]):
+        # Repeate plots but with Wien's law as points
+        peak_dots = VGroup()
+        for temp, color in zip(temperatures, colors):
             new_temp_value = Text(f"{temp} K", font_size=28, color=color)
             new_temp_value.move_to(temp_value.get_center())
 
-            new_glow_cube = Cube(
-                side_length=2.6, fill_color=color, fill_opacity=0.15, stroke_width=0
-            )
-            new_glow_cube = create_square_glow(cube, 1.7, color=color)
-            new_glow_cube.move_to(glow_cube.get_center())
-
             self.play(
                 Transform(temp_value, new_temp_value),
+                Transform(
+                    graph, axes.plot(partial(planck_function_nm, temperature=temp))
+                ),
                 black_body[0].animate.set_color(color),
                 run_time=1.5,
             )
             self.wait(0.5)
 
-        self.wait(2)
+            peak_at_nm = wien_displacement(temp) / 1e-9
+            peak_dot = axes.plot_line_graph(
+                [peak_at_nm],
+                [planck_function_nm(peak_at_nm, temp)],
+                vertex_dot_style={"stroke_width": 1, "fill_color": BLACK},
+            )
+            self.play(Create(peak_dot))
+            peak_dots += peak_dot
 
-        # self.move_camera(phi=-45 * DEGREES, theta=50 * DEGREES)
-        self.move_camera(*state)
-        self.camera
-        self.wait(1)
+        # Clean Screen except the title
+        self.play(*[FadeOut(mobj) for mobj in self.mobjects if mobj != title])
+
+        self.next_section()
+
+        # Show heated iron image
+        blacksmith_img = (
+            Group(
+                ImageMobject("./figures/Blacksmith_at_work02_s.jpg", 800),
+                Text("Fir0002/Flagstaffotos, CC BY-NC 3.0", 0.6, font_size=10),
+            )
+            .arrange(DOWN)
+            .to_edge(DOWN)
+        )
+        self.play(FadeIn(blacksmith_img))
+        # Show indication arrow
+        arrow = Arrow(start=UP, end=DOWN).shift(UP / 2)
+        self.play(Create(arrow))
+        self.play(arrow.animate.shift(2 * RIGHT), run_time=4)
+        self.play(FadeOut(arrow), FadeOut(blacksmith_img))
+
+        # Show thermal camera image
+        human_thermal_img = (
+            Group(
+                ImageMobject("./figures/Human-Visible.jpg", 600),
+                ImageMobject("./figures/Human-Infrared.jpg", 650),
+                Text("NASA/IPAC", 0.6, font_size=10),
+            )
+            .arrange(DOWN)
+            .to_edge(DOWN)
+        )
+        self.play(FadeIn(human_thermal_img))
+        self.play(FadeOut(human_thermal_img))
+
+
+        # Show Sun's surface temperature from as black body radiation
+        sun_img = (
+            Group(
+                ImageMobject("./figures/sun_surface.jpg", 1080),
+                Text("NASA/JAXA Hinode mission", 0.6, font_size=10),
+            )
+            .arrange(DOWN)
+            .to_edge(DOWN)
+        )
+        sun_temp_label = Text("~5,800 K").to_edge(LEFT)
+        sun_eff_temp_label = Text("5,778 K").next_to(sun_temp_label, DOWN)
+        self.play(FadeIn(sun_img))
+        self.play(Write(wien_eq))
+        self.play(Write(sun_temp_label))
+        self.play(Write(sun_eff_temp_label))
+        self.play(*[FadeOut(mobj) for mobj in self.mobjects if mobj != title])
+
+        # Show house daily lamps colors are from black body model
+
+
+        self.wait()
+
+
+# class RayleighJeansCatastrophe(Scene):
+#     def construct(self):
+#         title = Title(_("How was Quantum Physics started?"))
+#         sub_title = Title(_("Black body"))
+#
+#         this_vid_topics = BulletedList(
+#             _("Black body."),
+#             _("Black body radiation."),
+#             _("Ultraviolet catastrophe."),
+#             _("Photons."),
+#             _("Quanta."),
+#         )
+#
+#         self.play(Write(title, reverse=True, remover=False))
+#
+#         for l in this_vid_topics:
+#             self.play(Write(l, reverse=IS_RTL, remover=False))
+#
+#         self.play(this_vid_topics.animate.fade_all_but(0))
+#
+#         self.play(Transform(title, sub_title))
+#         self.play(FadeOut(this_vid_topics))
+#
+#         paul_portrait = ImageMobject("./figures/Paul_Ehrenfest.jpg")
+#         paul_name = Text(_("Paul Ehrenfest")).next_to(paul_portrait, DOWN)
+#         self.play(FadeIn(paul_portrait))
+#         self.wait()
+#         self.play(Write(paul_name, reverse=IS_RTL, remover=False))
+#         self.play(FadeOut(paul_portrait), Uncreate(paul_name))
+#         self.wait()
+#
+#         bb_facts = BulletedList(
+#             _("It absorbs all light completely."),
+#             _("It radiates electromagnetic waves base on its temp."),
+#         )
+#
+#         for l in bb_facts:
+#             self.play(Write(l, reverse=IS_RTL, remover=False))
+#
+#         self.play(bb_facts.animate.fade_all_but(1))
+#         self.wait()
+#         self.play(FadeOut(bb_facts))
+#
+#         axes = (
+#             Axes(
+#                 x_range=[1, 3000, 100],
+#                 y_range=[0, 20, 2],
+#                 axis_config={"color": BLUE},
+#                 x_axis_config={
+#                     "numbers_to_include": np.arange(0, 3001, 500),
+#                     "numbers_with_elongated_ticks": np.arange(0, 3001, 500),
+#                 },
+#                 y_axis_config={
+#                     "numbers_to_include": np.arange(0, 21, 4),
+#                     "numbers_with_elongated_ticks": np.arange(0, 20, 4),
+#                 },
+#                 tips=False,
+#             )
+#             .scale(0.6)
+#             .shift(DOWN + RIGHT)
+#         )
+#
+#         # Labels
+#         x_label = axes.get_x_axis_label(r"\lambda (nm)")
+#         y_label = axes.get_y_axis_label(
+#             r"Spectral Radiance\\(kW\cdot sr^{-1}\cdot m^{-3})"
+#         )
+#         labels = VGroup(x_label, y_label)
+#         labels.scale(0.5)
+#
+#         # Visible spectrum range (380nm to 750nm)
+#         visible_range = Rectangle(
+#             width=axes.x_axis.unit_size * (750 - 380),
+#             height=4,
+#             fill_opacity=0.7,
+#             stroke_width=0,
+#         )
+#         visible_range.move_to(axes.c2p((380 + 750) / 2, 0, 0), aligned_edge=DOWN)
+#         colors = [GRAY_E, PURPLE, BLUE, GREEN, YELLOW, RED, GRAY_E]
+#         visible_range.set_color_by_gradient(colors)
+#         visible_range.set_sheen_direction(RIGHT)
+#
+#         # Create graphs for different temperatures
+#         temperatures = [3000, 4000, 5000]
+#         graphs = VGroup()
+#         temp_labels = VGroup()
+#
+#         for temp in temperatures:
+#             wavelengths = np.linspace(1100e-9, 3000e-9, 100)
+#             spectral_radiance = [rayleigh_jeans(w, temp) for w in wavelengths]
+#
+#             graph = axes.plot_line_graph(
+#                 x_values=wavelengths * 1e9,
+#                 y_values=spectral_radiance,
+#                 line_color=BLUE,
+#                 add_vertex_dots=False,
+#             )
+#
+#             temp_label = Text(f"{temp}K", font_size=24, color=BLUE_A)
+#             temp_label.next_to(graph, RIGHT)
+#
+#             graphs.add(graph)
+#             temp_labels.add(temp_label)
+#
+#         # Visible spectrum label
+#         visible_label = Text(_("Visible Spectrum"), font_size=14)
+#         visible_label.next_to(visible_range, UP)
+#
+#         visible_brace = Brace(visible_range, buff=0.4)
+#         visible_brace.put_at_tip(visible_label)
+#         self.add(visible_brace)
+#
+#         ir_range = Rectangle(
+#             width=(axes.c2p(3000) - visible_range.get_right())[0],
+#             height=4,
+#             fill_opacity=0.1,
+#             stroke_width=0,
+#         ).next_to(visible_range, RIGHT, buff=0)
+#         uv_range = Rectangle(
+#             width=(visible_range.get_left() - axes.c2p(0))[0],
+#             height=4,
+#             fill_opacity=0.1,
+#             stroke_width=0,
+#         ).next_to(visible_range, LEFT, buff=0)
+#
+#         self.next_section()
+#
+#         # Create the black body cube
+#         cube = Cube(
+#             side_length=2,
+#             fill_color=BLACK,
+#             fill_opacity=0.65,
+#             stroke_color=DARK_GRAY,
+#             stroke_width=1,
+#             stroke_opacity=1,
+#         )
+#         cube.set_shade_in_3d(True)
+#         glow_cube = create_square_glow(cube, 2).set_z_index(-2)
+#         black_body = VGroup(glow_cube, cube).to_edge(LEFT).rotate(PI / 2, RIGHT)
+#
+#         # Animation sequence
+#         self.play(Create(axes), Write(labels))
+#         self.wait()
+#
+#         self.play(FadeIn(visible_range), Write(visible_label))
+#         self.wait()
+#
+#         self.add(ir_range, uv_range)
+#         self.play(Indicate(ir_range, 1.1))
+#         self.play(Indicate(uv_range, 1.1))
+#         self.play(FadeOut(ir_range), FadeOut(uv_range))
+#
+#         for graph, label in zip(graphs, temp_labels):
+#             self.play(Create(graph), Write(label), run_time=1.5)
+#             self.wait(0.5)
+#
+#         # Simulate temperature changes with color shifts
+#         temperatures = [2000, 3000, 4000, 4500, 5500]
+#         colors = ["#FF0017", "#FF7C00", "#CEB04D", "#83B28D", "#3DA8AD"]
+#
+#         graph = axes.plot(partial(planck_function_nm, temperature=1000))
+#         self.add(axes, graph)
+#
+#         # Temperature indicator
+#         temp_value = Text("2000 K", font_size=28, color=YELLOW)
+#         temp_value.move_to(black_body, DOWN).shift(DOWN)
+#
+#         self.play(FadeIn(black_body[1]))
+#         self.play(Rotate(black_body[1], axis=UP), run_time=4)
+#
+#         self.play(FadeIn(black_body[0]))
+#         self.play(FadeIn(temp_value))
+#         self.play(Indicate(temp_value))
+#
+#         for temp, color in zip(temperatures[1:], colors[1:]):
+#             new_temp_value = Text(f"{temp} K", font_size=28, color=color)
+#             new_temp_value.move_to(temp_value.get_center())
+#
+#             self.play(
+#                 Transform(temp_value, new_temp_value),
+#                 Transform(
+#                     graph, axes.plot(partial(planck_function_nm, temperature=temp))
+#                 ),
+#                 black_body[0].animate.set_color(color),
+#                 run_time=1.5,
+#             )
+#             self.wait(0.5)
+#
+#         self.wait(2)
+#
+#
+# # Alternative version with temperature visualization
+# class BlackBodyWithTemperature(ThreeDScene):
+#     def construct(self):
+#         # Create the black body cube
+#         cube = Cube(
+#             side_length=2.5,
+#             fill_color=BLACK,
+#             fill_opacity=0.95,
+#             stroke_color=DARK_GRAY,
+#             stroke_width=1,
+#             stroke_opacity=0.4,
+#         )
+#         cube.set_shade_in_3d(True)
+#
+#         # Create a subtle glow effect around the cube
+#         glow_cube = Cube(
+#             side_length=2.6, fill_color=RED, fill_opacity=0.1, stroke_width=0
+#         )
+#         glow_cube = create_square_glow(cube, 1.7)
+#
+#         # Group cube and glow
+#         black_body = VGroup(glow_cube, cube)
+#
+#         # Title and labels
+#         title = Text("Black Body at Different Temperatures", font_size=36, color=WHITE)
+#         title.to_edge(UP, buff=0.5)
+#
+#         # Temperature indicator
+#         temp_text = Text("Temperature: ", font_size=28, color=WHITE)
+#         temp_value = Text("1000 K", font_size=28, color=YELLOW)
+#         temp_group = VGroup(temp_text, temp_value)
+#         temp_group.arrange(RIGHT, buff=0.2)
+#         temp_group.to_edge(DOWN, buff=1)
+#
+#         # Set 3D camera
+#         # self.set_camera_orientation(phi=70 * DEGREES, theta=45 * DEGREES)
+#
+#         # Animations
+#         self.play(Write(title), run_time=1.5)
+#         self.play(FadeIn(black_body[1]), Write(temp_group))
+#         self.play(FadeIn(black_body[0]))
+#
+#         state = self.camera.get_phi(), self.camera.get_theta()
+#         self.move_camera(phi=45 * DEGREES, theta=-50 * DEGREES)
+#         self.wait(1)
+#
+#         # Final rotation
+#         self.play(Rotate(black_body), run_time=3)
+#
+#         # Simulate temperature changes with color shifts
+#         temperatures = [1000, 2000, 3000, 5000, 8000]
+#         colors = [0xFF0017, 0xFF7C00, 0xCEB04D, 0x83B28D, 0x3DA8AD]
+#
+#         for temp, color in zip(temperatures[1:], colors[1:]):
+#             new_temp_value = Text(f"{temp} K", font_size=28, color=color)
+#             new_temp_value.move_to(temp_value.get_center())
+#
+#             new_glow_cube = Cube(
+#                 side_length=2.6, fill_color=color, fill_opacity=0.15, stroke_width=0
+#             )
+#             new_glow_cube = create_square_glow(cube, 1.7, color=color)
+#             new_glow_cube.move_to(glow_cube.get_center())
+#
+#             self.play(
+#                 Transform(temp_value, new_temp_value),
+#                 black_body[0].animate.set_color(color),
+#                 run_time=1.5,
+#             )
+#             self.wait(0.5)
+#
+#         self.wait(2)
+#
+#         # self.move_camera(phi=-45 * DEGREES, theta=50 * DEGREES)
+#         self.move_camera(*state)
+#         self.camera
+#         self.wait(1)
