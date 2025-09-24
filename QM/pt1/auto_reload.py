@@ -7,7 +7,7 @@ import os
 
 def run_manim():
     # Run manim with -pqm flags (preview quality, don't open media player)
-    subprocess.run(["manim", "scene.py", "Introduction", "-ql"])
+    subprocess.run(["manim", "scene.py", "RayleighJeansCatastrophe", "-ql"])
 
     # Get the latest rendered file
     media_dir = "./media/videos/scene/480p15/"
