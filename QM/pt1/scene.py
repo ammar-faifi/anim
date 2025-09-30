@@ -581,13 +581,306 @@ class RayleighJeansCatastrophe(Introduction):
         self.play(Write(b_limit))
 
         # What is going OnNnNN !?
-        big_q = Text('?!', font_size=100).to_edge(RIGHT)
-        big_q2 = Text('?', font_size=200).next_to(big_q, UL)
-        big_q3 = Text('?', font_size=250).next_to(big_q2, DL)
-        big_q4 = Text('?', font_size=150).next_to(big_q3, UL)
+        big_q = Text("?!", font_size=100).to_edge(RIGHT)
+        big_q2 = Text("?", font_size=200).next_to(big_q, UL)
+        big_q3 = Text("?", font_size=250).next_to(big_q2, DL)
+        big_q4 = Text("?", font_size=150).next_to(big_q3, UL)
         self.play(Create(big_q))
         self.play(Create(big_q2))
         self.play(Create(big_q3))
         self.play(Create(big_q4))
 
+        self.play(*[FadeOut(mobj) for mobj in self.mobjects if mobj != self.title])
+
+        self.wait()
+
+
+class PlanckLaw(Scene):
+    """
+    # Points to mention:
+        - Plank idea of qunta
+        - Plank's equation
+        - E2 - E1 directly propotional to f of light
+        - `h` is the proptionality constant
+
+    # Visuals:
+        - Show equation
+        - show electron jumps E2-E1 ?
+        - show the plots from his law
+    """
+
+    def construct(self):
+
+        self.next_section(skip_animations=True)
+
+        plank_law = MathTex(
+            r"B = \frac{2h\nu^3}{c^2} \cdot \frac{1}{e^{\frac{h\nu}{k_B T}} - 1}"
+        )
+        quanta_eq = MathTex(r"E_2 - E_1 = h \nu").next_to(plank_law, DOWN)
+
+        # self.play(Write(plank_law))
+        # self.play(Write(quanta_eq))
+
+        # Title
+        title = Title(r"Plank's Law")
+        title.to_edge(UP)
+        self.play(Write(title))
+        self.wait(0.5)
+
+        # Create nucleus
+        nucleus = Dot(ORIGIN, radius=0.15, color=RED).shift(DOWN)
+        nucleus_label = Text(_("Nucleus"), font_size=20).next_to(
+            nucleus, DOWN, buff=0.3
+        )
+
+        # Ground state orbit (dashed)
+        ground_orbit = Circle(radius=1.5, color=BLUE, stroke_width=2)
+        ground_orbit.set_stroke(opacity=0.5)
+        ground_orbit.move_to(nucleus.get_center())
+
+        # Excited state orbit (dashed)
+        excited_orbit = Circle(radius=2.5, color=PURPLE, stroke_width=2)
+        excited_orbit.set_stroke(opacity=0.5)
+        excited_orbit.move_to(nucleus.get_center())
+
+        # Energy level labels
+        ground_label = MathTex("E_1", font_size=32, color=BLUE)
+        ground_label.move_to(ground_orbit.point_at_angle(0) + RIGHT * 0.5)
+
+        excited_label = MathTex("E_2", font_size=32, color=PURPLE)
+        excited_label.move_to(excited_orbit.point_at_angle(0) + RIGHT * 0.5)
+
+        # Create electron
+        electron = Dot(radius=0.1, color=YELLOW).set_z_index(2)
+        electron.move_to(ground_orbit.point_at_angle(PI / 2))
+        electron_label = Text("e⁻", font_size=24, color=YELLOW).next_to(electron, DOWN)
+
+        # Draw initial setup
+        self.play(
+            Create(nucleus),
+            Write(nucleus_label),
+            Create(ground_orbit),
+            Create(excited_orbit),
+            Write(ground_label),
+            Write(excited_label),
+        )
+        self.play(FadeIn(electron), Write(electron_label))
+        self.wait()
+
+        # # Phase 1: Absorption - Incident photon
+        # absorption_text = Text("Absorption", font_size=28, color=GREEN).to_edge(DOWN)
+        # self.play(Write(absorption_text))
+        #
+        # # Create incoming photon (EM wave)
+        # photon_start = LEFT * 6 + UP * 0.5
+        # photon_path = Line(photon_start, nucleus.get_center() + LEFT * 1, color=GREEN)
+        #
+        # # EM wave representation
+        # wave = FunctionGraph(
+        #     lambda x: 0.3 * np.sin(5 * x), x_range=[-6, -1], color=GREEN
+        # ).shift(UP * 0.5)
+        #
+        # photon_label = MathTex(r"h\nu = E_2 - E_1", font_size=24, color=GREEN)
+        # photon_label.next_to(wave, UP)
+        #
+        # self.play(Create(wave), Write(photon_label), run_time=1.5)
+        #
+        # # Photon approaches atom
+        # self.play(
+        #     wave.animate.shift(RIGHT * 5),
+        #     photon_label.animate.shift(RIGHT * 5),
+        #     run_time=1.5,
+        # )
+        #
+        # # Absorption occurs - photon disappears, electron excites
+        # self.play(FadeOut(wave), FadeOut(photon_label), run_time=0.3)
+
+        # Electron moves to excited state with orbital motion
+        ground_orbit.set_stroke(opacity=0.3)
+        excited_orbit.set_stroke(opacity=1)
+        electron.move_to(excited_orbit.point_at_angle(PI / 2))
+        electron_label.next_to(electron, DOWN)
+
+        # # Electron orbits in excited state briefly
+        # self.play(
+        #     Rotate(electron, angle=2 * PI, about_point=nucleus.get_center()),
+        #     Rotate(electron_label, angle=2 * PI, about_point=nucleus.get_center()),
+        #     run_time=2,
+        #     rate_func=linear,
+        # )
+        # self.wait(0.5)
+        #
+        # # Phase 2: Emission - Spontaneous emission
+        # self.play(FadeOut(absorption_text))
+        # emission_text = Text(
+        #     "Spontaneous Emission", font_size=28, color=YELLOW
+        # ).to_edge(DOWN)
+        # self.play(Write(emission_text))
+        #
+        # # Electron returns to ground state
+        # current_angle = PI * 2  # After one orbit
+        # ground_return = ground_orbit.point_at_angle(current_angle)
+        #
+        # arc_path_return = ArcBetweenPoints(
+        #     electron.get_center(), ground_return, angle=PI / 3
+        # )
+        #
+        # # Create emitted photon
+        # emitted_wave = FunctionGraph(
+        #     lambda x: 0.3 * np.sin(5 * x), x_range=[0, 5], color=YELLOW
+        # ).move_to(nucleus.get_center())
+        #
+        # emitted_photon_label = MathTex(r"h\nu", font_size=24, color=YELLOW)
+        # emitted_photon_label.next_to(emitted_wave, UP)
+        #
+        # self.play(
+        #     MoveAlongPath(electron, arc_path_return),
+        #     electron_label.animate.move_to(ground_return + RIGHT * 0.3),
+        #     electron.animate.set_color(YELLOW),
+        #     ground_orbit.animate.set_stroke(opacity=1),
+        #     excited_orbit.animate.set_stroke(opacity=0.5),
+        #     Create(emitted_wave),
+        #     Write(emitted_photon_label),
+        #     run_time=1,
+        # )
+        #
+        # # Photon moves away
+        # self.play(
+        #     emitted_wave.animate.shift(RIGHT * 6),
+        #     emitted_photon_label.animate.shift(RIGHT * 6),
+        #     run_time=1.5,
+        # )
+        #
+        # self.play(FadeOut(emitted_wave), FadeOut(emitted_photon_label))
+        #
+        # # Final orbit in ground state
+        # self.play(
+        #     Rotate(electron, angle=2 * PI, about_point=nucleus.get_center()),
+        #     Rotate(electron_label, angle=2 * PI, about_point=nucleus.get_center()),
+        #     run_time=2,
+        #     rate_func=linear,
+        # )
+        #
+        # self.wait(2)
+
+        atom_model = VGroup(
+            nucleus,
+            electron,
+            ground_orbit,
+            excited_orbit,
+            ground_label,
+            excited_label,
+            nucleus_label,
+            electron_label,
+        )
+        self.play(atom_model.animate.scale(0.6).to_edge(LEFT))
+
+        energy_density = MathTex(r"\frac{du}{d\nu}")
+
+        plank_lhs = MathTex(r"\frac{du}{d\nu}")
+        plank_rhs = MathTex(r"\frac{du}{d\nu}").to_edge(RIGHT)
+
+        plank_eq = MathTex(
+            r"\frac{N_2}{N_1} = "
+            r"\frac{B_{12} (\frac{du}{d\nu})}{B_{21} (\frac{du}{d\nu}) + A_{21}}"
+        )
+
+        N1, N2 = MathTex("N_1"), MathTex("N_2")
+        B12, B21 = MathTex("B_{12}"), MathTex("N_{21}")
+        self.add(plank_lhs, plank_rhs)
+
+        self.play(Transform(plank_lhs, MathTex(r"B_{12}\frac{du}{d\nu}")))
+        self.play(
+            Transform(plank_lhs, MathTex(r"N_1 \left[ B_{12}\frac{du}{d\nu} \right]"))
+        )
+        self.play(
+            Transform(plank_rhs, MathTex(r"B_{21}\frac{du}{d\nu}").to_edge(RIGHT))
+        )
+        self.play(
+            Transform(
+                plank_rhs, MathTex(r"B_{21}\frac{du}{d\nu} + A{21}").to_edge(RIGHT)
+            )
+        )
+
+        self.play(
+            Transform(
+                plank_rhs,
+                MathTex(r"N_2 \left[ B_{21}\frac{du}{d\nu} + A{21} \right]").to_edge(
+                    RIGHT
+                ),
+            )
+        )
+
+        self.play(Circumscribe(plank_lhs))
+        self.play(Circumscribe(plank_rhs))
+
+        self.play(
+            Transform(
+                plank_rhs,
+                MathTex(r"= N_2 \left[ B_{21}\frac{du}{d\nu} + A{21} \right]").to_edge(
+                    RIGHT
+                ),
+            )
+        )
+        self.play(FadeOut(plank_lhs), FadeOut(plank_rhs), Write(plank_eq))
+        self.play(plank_eq.animate.scale(0.7).next_to(atom_model, UP))
+
+        self.next_section()
+
+        boltz_2 = MathTex(r"N_2 \propto \exp{\left(-\frac{E_2}{kT} \right)}")
+        boltz_1 = MathTex(r"N_1 \propto \exp{\left(-\frac{E_1}{kT} \right)}").next_to(
+            boltz_2, DOWN
+        )
+        boltz_eq = MathTex(
+            r"\frac{N_2}{N_1} = " r"\exp{\left( - \frac{E_2 - E_1}{kT} \right)}"
+        )
+
+        self.play(Write(boltz_2))
+        self.play(Write(boltz_1))
+        self.play(
+            Transform(
+                boltz_2, MathTex(r"N_2 = N_0 \exp{\left(-\frac{E_2}{kT} \right)}")
+            ),
+            Transform(
+                boltz_1,
+                MathTex(r"N_1 = N_0 \exp{\left(-\frac{E_1}{kT} \right)}").next_to(
+                    boltz_2, DOWN
+                ),
+            ),
+        )
+        self.play(Uncreate(boltz_2), Uncreate(boltz_1), Write(boltz_eq))
+        self.play(
+            boltz_eq.animate.shift(DOWN),
+            plank_eq.animate.scale(1.3).next_to(boltz_eq, UP),
+            FadeOut(atom_model),
+        )
+
+        self.play(
+            Uncreate(boltz_eq),
+            Transform(
+                plank_eq,
+                MathTex(
+                    r"\exp{\left( - \frac{E_2 - E_1}{kT} \right)} = "
+                    r"\frac{B_{12} (\frac{du}{d\nu})}{B_{21} (\frac{du}{d\nu}) + A_{21}}"
+                ),
+            ),
+        )
+
+        self.play(
+            Transform(
+                plank_eq,
+                MathTex(
+                    r"\frac{du}{d\nu} = "
+                    r"\frac{A_{21} / B_{21}} {\exp{\left(\frac{E_2 - E_1}{kT} \right)} - 1}"
+                ),
+            ),
+        )
+
+        self.play(plank_eq.animate.shift(2 * DOWN))
+
+        plank_asump = MathTex(r"E_2 - E_1 \propto \nu").set_color(BLUE)
+        self.play(Write(plank_asump))
+
+        # Fade out
+        # self.play(*[FadeOut(mob) for mob in self.mobjects])
         self.wait()
