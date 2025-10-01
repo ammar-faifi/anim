@@ -1,13 +1,14 @@
+import os
+import subprocess
+import time
+
 import watchdog.events
 import watchdog.observers
-import time
-import subprocess
-import os
 
 
 def run_manim():
     # Run manim with -pqm flags (preview quality, don't open media player)
-    subprocess.run(["manim", "scene.py", "PlanckLaw", "-ql"])
+    subprocess.run(["manim", "scene.py", "PhotoelectricEffect", "-ql"])
 
     # Get the latest rendered file
     media_dir = "./media/videos/scene/480p15/"

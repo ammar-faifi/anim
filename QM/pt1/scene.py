@@ -787,7 +787,7 @@ class PlanckLaw(Scene):
 
         N1, N2 = MathTex("N_1"), MathTex("N_2")
         B12, B21 = MathTex("B_{12}"), MathTex("N_{21}")
-        self.add(plank_lhs, plank_rhs)
+        self.play(Write(plank_lhs), Write(plank_rhs))
 
         self.play(Transform(plank_lhs, MathTex(r"B_{12}\frac{du}{d\nu}")))
         self.play(
@@ -824,8 +824,6 @@ class PlanckLaw(Scene):
         )
         self.play(FadeOut(plank_lhs), FadeOut(plank_rhs), Write(plank_eq))
         self.play(plank_eq.animate.scale(0.7).next_to(atom_model, UP))
-
-        self.next_section()
 
         boltz_2 = MathTex(r"N_2 \propto \exp{\left(-\frac{E_2}{kT} \right)}")
         boltz_1 = MathTex(r"N_1 \propto \exp{\left(-\frac{E_1}{kT} \right)}").next_to(
@@ -878,9 +876,318 @@ class PlanckLaw(Scene):
 
         self.play(plank_eq.animate.shift(2 * DOWN))
 
-        plank_asump = MathTex(r"E_2 - E_1 \propto \nu").set_color(BLUE)
-        self.play(Write(plank_asump))
+        plank_assump = (
+            VGroup(
+                MathTex(r"E_2 - E_1"),
+                VGroup(
+                    MathTex(r"\propto \nu"),
+                    MathTex(r"= h \nu"),
+                ),
+            )
+            .arrange()
+            .set_color(BLUE)
+        )
+        self.play(Write(plank_assump[0]), Write(plank_assump[1][0]))
+        self.play(Circumscribe(plank_assump))
+        self.play(Transform(plank_assump[1][0], plank_assump[1][1]))
+        self.play(FadeOut(plank_assump), FadeOut(plank_eq))
 
-        # Fade out
-        # self.play(*[FadeOut(mob) for mob in self.mobjects])
+        self.next_section()
+        plank_law = MathTex(
+            r"B = \frac{2hc^2}{\lambda^2} \frac{1}{e^{\frac{hc}{\lambda kT} - 1}"
+        ).scale(1.5)
+        self.play(Write(plank_law))
+        self.play(Circumscribe(plank_law[0][0]))
+        self.play(Circumscribe(plank_law[0][3]))
+        self.play(Circumscribe(plank_law[0][4]))
+        self.play(Circumscribe(plank_law[0][7]), Circumscribe(plank_law[0][15]))
+        self.play(Circumscribe(plank_law[0][16]))
+        self.play(Circumscribe(plank_law[0][17]))
+
+        self.play(*[FadeOut(mob) for mob in self.mobjects])
+        self.wait()
+
+
+class PhotoelectricEffectApparatus(VGroup):
+    """
+    A Manim mobject representing a photoelectric effect apparatus.
+
+    The apparatus consists of:
+    - A square vacuum chamber
+    - An emitter plate (bottom) - the metal surface that emits electrons
+    - A collector plate (top) - catches the emitted electrons
+    """
+
+    def __init__(
+        self,
+        chamber_size=4,
+        plate_width=2.5,
+        plate_height=0.3,
+        plate_separation=2,
+        chamber_color=BLUE,
+        emitter_color=GOLD,
+        collector_color=GRAY,
+        **kwargs,
+    ):
+        super().__init__(**kwargs)
+
+        # Create the vacuum chamber (square)
+        self.chamber = Square(
+            side_length=chamber_size,
+            color=chamber_color,
+            stroke_width=3,
+            fill_opacity=0.06,
+        )
+
+        # Create the emitter (bottom metal plate - photocathode)
+        self.emitter = Rectangle(
+            width=plate_width,
+            height=plate_height,
+            color=emitter_color,
+            fill_opacity=0.8,
+            stroke_width=2,
+        )
+
+        # Create the collector (top plate - anode)
+        self.collector = Rectangle(
+            width=plate_width,
+            height=plate_height,
+            color=collector_color,
+            fill_opacity=0.6,
+            stroke_width=2,
+        )
+
+        # Position the emitter at the bottom
+        self.emitter.shift(DOWN * plate_separation / 2)
+
+        # Position the collector at the top
+        self.collector.shift(UP * plate_separation / 2)
+
+        # Add labels
+        self.emitter_label = Text("Emitter\n(Photocathode)", font_size=18)
+        self.emitter_label.next_to(self.emitter, DOWN, buff=0.3)
+
+        self.collector_label = Text("Collector\n(Anode)", font_size=18)
+        self.collector_label.next_to(self.collector, UP, buff=0.3)
+
+        # Add terminal connections (small circles for electrical connections)
+        self.emitter_terminal = Circle(radius=0.1, color=RED, fill_opacity=1)
+        self.emitter_terminal.next_to(self.emitter, LEFT, buff=0.1)
+
+        self.collector_terminal = Circle(radius=0.1, color=RED, fill_opacity=1)
+        self.collector_terminal.next_to(self.collector, LEFT, buff=0.1)
+
+        # Add wires connecting to terminals
+        self.emitter_wire = Line(
+            self.emitter.get_left(),
+            self.emitter_terminal.get_center(),
+            color=RED,
+            stroke_width=2,
+        )
+
+        self.collector_wire = Line(
+            self.collector.get_left(),
+            self.collector_terminal.get_center(),
+            color=RED,
+            stroke_width=2,
+        )
+
+        # Create voltage indicator (circular meter with arrow)
+        voltmeter_radius = 0.5
+        self.voltmeter = Circle(radius=voltmeter_radius, color=WHITE, stroke_width=3)
+
+        # Position voltmeter to the left of the chamber
+        voltmeter_position = self.chamber.get_left() + LEFT * 1.5
+        self.voltmeter.move_to(voltmeter_position)
+
+        # Create the indicator arrow (needle) inside the voltmeter
+        self.voltmeter_arrow = Arrow(
+            start=self.voltmeter.get_center(),
+            end=self.voltmeter.get_center() + UP * voltmeter_radius * 0.7,
+            color=RED,
+            buff=0,
+            stroke_width=3,
+            max_tip_length_to_length_ratio=0.3,
+        )
+
+        # Add V label on the voltmeter
+        self.voltmeter_label = Text("V", font_size=24, color=YELLOW)
+        self.voltmeter_label.move_to(self.voltmeter.get_center() + DOWN * 0.25)
+
+        # Create connection wires from voltmeter to terminals
+        # Top connection to collector terminal
+        self.voltmeter_top_connection = self.voltmeter.get_top() + UP * 0.1
+        self.voltmeter_to_collector = VGroup()
+
+        # Wire going up and then right to collector terminal
+        wire_point1 = self.voltmeter.get_top()
+        wire_point2 = wire_point1 + UP * 0.5
+        wire_point3 = [self.collector_terminal.get_center()[0], wire_point2[1], 0]
+        wire_point4 = self.collector_terminal.get_center()
+
+        self.voltmeter_to_collector.add(
+            Line(wire_point1, wire_point2, color=RED, stroke_width=2),
+            Line(wire_point2, wire_point3, color=RED, stroke_width=2),
+            Line(wire_point3, wire_point4, color=RED, stroke_width=2),
+        )
+
+        # Bottom connection to emitter terminal
+        self.voltmeter_to_emitter = VGroup()
+
+        # Wire going down and then right to emitter terminal
+        wire_point1 = self.voltmeter.get_bottom()
+        wire_point2 = wire_point1 + DOWN * 0.5
+        wire_point3 = [self.emitter_terminal.get_center()[0], wire_point2[1], 0]
+        wire_point4 = self.emitter_terminal.get_center()
+
+        self.voltmeter_to_emitter.add(
+            Line(wire_point1, wire_point2, color=RED, stroke_width=2),
+            Line(wire_point2, wire_point3, color=RED, stroke_width=2),
+            Line(wire_point3, wire_point4, color=RED, stroke_width=2),
+        )
+
+        # Add all components to the VGroup
+        self.add(
+            self.chamber,
+            self.emitter,
+            self.collector,
+            self.emitter_label,
+            self.collector_label,
+            self.emitter_terminal,
+            self.collector_terminal,
+            self.emitter_wire,
+            self.collector_wire,
+            self.voltmeter,
+            self.voltmeter_label,
+            self.voltmeter_to_collector,
+            self.voltmeter_to_emitter,
+            self.voltmeter_arrow,
+        )
+
+    def create_photon(self, color=YELLOW):
+        """Create a photon (represented as a wavy arrow or dot)"""
+        photon = Dot(color=color, radius=0.1)
+        photon.move_to(self.chamber.get_right() + RIGHT * 0.5)
+        return photon
+
+    def create_electron(self):
+        """Create an electron (represented as a small blue dot with minus sign)"""
+        electron = VGroup()
+        dot = Dot(color=BLUE, radius=0.08)
+        minus = Text("-", font_size=16, color=WHITE)
+        minus.move_to(dot.get_center())
+        electron.add(dot, minus)
+        return electron
+
+    def get_emitter_surface(self):
+        """Return the top surface point of the emitter for electron emission"""
+        return self.emitter.get_top()
+
+    def get_collector_surface(self):
+        """Return the bottom surface point of the collector"""
+        return self.collector.get_bottom()
+
+    def set_voltage_arrow_angle(self, angle):
+        """
+        Rotate the voltmeter arrow to indicate voltage level.
+        angle in degrees: -90 (left) to +90 (right), 0 is up
+        """
+        # Remove old arrow
+        self.remove(self.voltmeter_arrow)
+
+        # Create new arrow at the specified angle
+        angle_rad = angle * DEGREES
+        end_point = self.voltmeter.get_center() + np.array(
+            [np.sin(angle_rad) * 0.35, np.cos(angle_rad) * 0.35, 0]
+        )
+
+        self.voltmeter_arrow = Arrow(
+            start=self.voltmeter.get_center(),
+            end=end_point,
+            color=RED,
+            buff=0,
+            stroke_width=3,
+            max_tip_length_to_length_ratio=0.3,
+        )
+
+        # Add the new arrow back
+        self.add(self.voltmeter_arrow)
+
+    def animate_set_voltage_angle(self, angle):
+        # Create new arrow at the specified angle
+        angle_rad = angle * DEGREES
+        end_point = self.voltmeter.get_center() + np.array(
+            [np.sin(angle_rad) * 0.35, np.cos(angle_rad) * 0.35, 0]
+        )
+
+        return self.voltmeter_arrow.animate.put_start_and_end_on(
+            self.voltmeter.get_center(), end_point
+        )
+
+
+class PhotoelectricEffect(Scene):
+    """
+    # Points to mention:
+        - photoelectric effect
+
+    # Visuals:
+        - Show expreiment apartus
+    """
+
+    def construct(self):
+
+        self.next_section(skip_animations=True)
+
+        # Title
+        title = Title(_("Photoelectric Effect"))
+        self.play(Write(title))
+
+        # Create the apparatus
+        apparatus = PhotoelectricEffectApparatus()
+
+        self.play(Write(title))
+        self.play(Create(apparatus), run_time=2)
+
+        # Demonstrate photon hitting emitter and electron emission
+        for i in range(3):
+            # Create photon
+            photon = apparatus.create_photon()
+
+            # Animate photon moving toward emitter
+            self.play(
+                photon.animate.move_to(apparatus.get_emitter_surface()), run_time=0.8
+            )
+            self.play(apparatus.animate_set_voltage_angle(30 * (i + 1)))
+
+            # Remove photon and create electron
+            electron = apparatus.create_electron().set_z_index(-1)
+            electron.move_to(apparatus.get_emitter_surface())
+
+            e_to = (
+                apparatus.get_collector_surface() / 2
+                if i == 2
+                else apparatus.get_collector_surface()
+            )
+            self.play(
+                FadeOut(photon),
+                electron.animate.move_to(e_to),
+            )
+            self.play(FadeOut(electron))
+
+        self.play(apparatus.animate.to_edge(LEFT))
+
+        self.next_section()
+
+        w_min_prop = MathTex(r"W \propto \nu_0").to_edge(RIGHT, buff=1.5)
+        w_min = MathTex(r"W = h \nu_0").to_edge(RIGHT, buff=1.5)
+        k_max = MathTex(r"K_{max} = h\nu - W").next_to(w_min, DOWN)
+
+        self.play(Write(w_min_prop[0][0]))
+        self.play(Write(w_min_prop[0][1:]))
+        self.play(ReplacementTransform(w_min_prop, w_min))
+        self.play(w_min.animate.shift(UP))
+        self.play(Write(k_max[0][0:4]))
+        self.play(Write(k_max[0][4:7]))
+        self.play(Write(k_max[0][7:]))
+
         self.wait()
