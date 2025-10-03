@@ -10,6 +10,6 @@ class MyAwesomeScene(VoiceoverScene):
         # self.set_speech_service(GTTSService())
         self.set_speech_service(RecorderService())
         circle = Circle()
-
+  
         with self.voiceover(text="This circle is drawn as I speak.") as tracker:
             self.play(Create(circle))

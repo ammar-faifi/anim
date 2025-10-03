@@ -199,7 +199,7 @@ class EventTimelineExample(Scene):
             1989: ("Fall of Berlin Wall", "path/to/berlin_wall.jpg"),
             2001: ("Internet Boom", "path/to/internet.jpg"),
             2007: ("iPhone Launch", "path/to/iphone.jpg"),
-            2020: ("COVID-19 Pandemic", "path/to/covid.jpg"),
+            # 2020: ("COVID-19 Pandemic", "path/to/covid.jpg"),
         }
 
         # Create timeline

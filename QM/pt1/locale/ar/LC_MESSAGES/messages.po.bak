@@ -7,127 +7,127 @@ msgid ""
 msgstr ""
 "Project-Id-Version: pt 1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-03 22:34+0300\n"
-"PO-Revision-Date: 2025-10-03 22:20+0300\n"
+"POT-Creation-Date: 2025-10-03 22:18+0300\n"
+"PO-Revision-Date: 2025-10-03 18:04+0300\n"
 "Last-Translator: Ammar Alfaifi <me@ammarf.sa>\n"
 "Language-Team: Arabic <(nothing)>\n"
 "Language: ar\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: scene.py:218
+#: scene.py:221
 msgid "How was Quantum Physics started?"
 msgstr "كيق بدأت فيزياء الكم؟"
 
-#: scene.py:219
+#: scene.py:222
 msgid "Black body"
 msgstr "الجسم الأسود"
 
-#: scene.py:222
+#: scene.py:225
 msgid "Black body."
 msgstr "الجسم الأسود."
 
-#: scene.py:223
+#: scene.py:226
 msgid "Black body radiation."
 msgstr "إشعاع الجسم الأسود."
 
-#: scene.py:224
+#: scene.py:227
 msgid "Ultraviolet catastrophe."
 msgstr "معضلة الأشعة فوق البنفسجية."
 
-#: scene.py:225
+#: scene.py:228
 msgid "Quanta."
 msgstr "كم"
 
-#: scene.py:226
+#: scene.py:229
 msgid "Photons."
 msgstr "فوتونات"
 
-#: scene.py:240 scene.py:1406
+#: scene.py:243 scene.py:1409
 msgid "Paul Ehrenfest"
 msgstr "بول إيرنفست"
 
-#: scene.py:248
+#: scene.py:251
 msgid "It absorbs all light completely."
 msgstr "يمتص كل الضوء بشكل كامل."
 
-#: scene.py:249
+#: scene.py:252
 msgid "It radiates electromagnetic waves base on its temp."
 msgstr "يشع موجات كهرومغناطيسية بناءً على درجة حرارته."
 
-#: scene.py:307
+#: scene.py:310
 msgid "Visible Spectrum"
 msgstr "الطيف المرئي"
 
-#: scene.py:406
+#: scene.py:409
 msgid "Wien's Law"
 msgstr "قانون وين"
 
-#: scene.py:528
+#: scene.py:531
 msgid "Ultraviolet catastrophe"
 msgstr "معضلة الأشعة فوق البنفسجية."
 
-#: scene.py:631
+#: scene.py:634
 msgid "Nucleus"
 msgstr "النواة"
 
-#: scene.py:965
+#: scene.py:968
 msgid "Emitter"
 msgstr "الباعث"
 
-#: scene.py:968
+#: scene.py:971
 msgid "Collector"
 msgstr "المجمع"
 
-#: scene.py:1138
+#: scene.py:1141
 msgid "Photoelectric Effect"
 msgstr "التأثير الكهروضوئي"
 
-#: scene.py:1187
+#: scene.py:1190
 msgid "Results..."
 msgstr "النتائج..."
 
-#: scene.py:1190
+#: scene.py:1193
 msgid "Max Planck showed energy is quantized."
 msgstr "أظهر ماكس بلانك أن الطاقة كمية."
 
-#: scene.py:1191
+#: scene.py:1194
 msgid "Correct prediction of black body radiation."
 msgstr "التنبؤ الصحيح بإشعاع الجسم الأسود."
 
-#: scene.py:1192
+#: scene.py:1195
 msgid "Einstein showed light is quantized; photons."
 msgstr "أظهر أينشتاين أن الضوء مكمّم؛ الفوتونات."
 
-#: scene.py:1193
+#: scene.py:1196
 msgid "And their energy depends only on its frequency."
 msgstr "وطاقتهم تعتمد فقط على تردده."
 
-#: scene.py:1402
+#: scene.py:1405
 msgid "Wilhelm Wien"
 msgstr "ويلهيلم وين"
 
-#: scene.py:1403
+#: scene.py:1406
 msgid "Lord Rayleigh"
 msgstr "اللورد رايلي"
 
-#: scene.py:1404
+#: scene.py:1407
 msgid "Max Planck"
 msgstr "ماكس بلانك"
 
-#: scene.py:1405
+#: scene.py:1408
 msgid "Albert Einstein"
 msgstr "ألبرت أينشتاين"
 
-#: scene.py:1407
+#: scene.py:1410
 msgid "Nobel for Planck"
 msgstr "جائزة نوبل لبلانك"
 
-#: scene.py:1409
+#: scene.py:1412
 msgid "Nobel for Einstein"
 msgstr "جائزة نوبل لأينشتاين"
 
-#: scene.py:1425
+#: scene.py:1428
 msgid "Historical Events Timeline"
 msgstr "الجدول الزمني للأحداث التاريخية"

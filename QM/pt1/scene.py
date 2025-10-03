@@ -5,30 +5,33 @@ from pathlib import Path
 import numpy as np
 from manim import *
 
-# from manimlib import *
-
-AR_PREAMBLE = r"""
-\usepackage[utf8]{inputenc}
-\usepackage{arabtex}
-\usepackage[arabic]{babel}
-
-\usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{kpfonts}
-"""
-
-
 # Setup translation with its domain
-languages = ["en"]
+languages = ["ar", "en"]
 localedir = Path(__file__).parent / "locale"
 t = gettext.translation("messages", localedir, languages, fallback=True)
+t.install()
 _ = t.gettext
 # right to left lang ?
-IS_RTL = False
+IS_RTL = True
+FONT = "Aref Ruqaa"
+FONT = "Waseem"
 
 # For Arabic LaTeX
-# config.tex_template = TexTemplate(preamble=AR_PREAMBLE)
 config.background_color = GRAY_E
+config.tex_template = TexTemplate(
+    tex_compiler="xelatex", output_format=".xdv"  # XeLaTeX output format
+)
+
+# Add packages to the template
+config.tex_template.add_to_preamble(
+    r"""
+\usepackage{polyglossia}
+\usepackage{fontspec}
+\setmainlanguage{arabic}
+\setotherlanguage{english}
+\newfontfamily\arabicfont[Script=Arabic]{Waseem}
+"""
+)
 
 
 def create_square_glow(vmobject, length: float = 1, color=YELLOW):
@@ -352,7 +355,9 @@ class Introduction(ThreeDScene):
 
         # Show the visible range
         self.play(Create(visible_brace))
-        self.play(FadeIn(visible_range), Write(visible_label))
+        self.play(
+            FadeIn(visible_range), Write(visible_label, reverse=True, remover=False)
+        )
         self.wait()
 
         # Show the IR and UV ranges
@@ -412,7 +417,7 @@ class Introduction(ThreeDScene):
             .move_to(wien_eq)
             .scale(0.6)
         )
-        self.play(Write(wien_label))
+        self.play(Write(wien_label, reverse=True, remover=False))
         self.play(Unwrite(wien_label))
         self.play(Write(wien_eq))
         self.play(Circumscribe(wien_eq[0]))
@@ -510,8 +515,6 @@ class Introduction(ThreeDScene):
 class RayleighJeansCatastrophe(Introduction):
     def construct(self):
 
-        self.next_section(skip_animations=True)
-
         super().construct()
 
         self.axes.shift(DOWN / 2)
@@ -570,8 +573,6 @@ class RayleighJeansCatastrophe(Introduction):
         # Highlihgt lambda being in deno
         self.play(Circumscribe(rj_eq[0][8:10]))
 
-        self.next_section()
-
         # show B goes to inf as labmda goes to 0
         b_limit = (
             MathTex(r"B \rightarrow \infty, \, \lambda \rightarrow 0")
@@ -611,8 +612,6 @@ class PlanckLaw(Scene):
 
     def construct(self):
 
-        self.next_section(skip_animations=True)
-
         plank_law = MathTex(
             r"B = \frac{2h\nu^3}{c^2} \cdot \frac{1}{e^{\frac{h\nu}{k_B T}} - 1}"
         )
@@ -624,7 +623,7 @@ class PlanckLaw(Scene):
         # Title
         title = Title(r"Plank's Law")
         title.to_edge(UP)
-        self.play(Write(title))
+        self.play(Write(title, reverse=True, remover=False))
         self.wait(0.5)
 
         # Create nucleus
@@ -658,7 +657,7 @@ class PlanckLaw(Scene):
         # Draw initial setup
         self.play(
             Create(nucleus),
-            Write(nucleus_label),
+            Write(nucleus_label, reverse=True, remover=False),
             Create(ground_orbit),
             Create(excited_orbit),
             Write(ground_label),
@@ -892,7 +891,6 @@ class PlanckLaw(Scene):
         self.play(Transform(plank_assump[1][0], plank_assump[1][1]))
         self.play(FadeOut(plank_assump), FadeOut(plank_eq))
 
-        self.next_section()
         plank_law = MathTex(
             r"B = \frac{2hc^2}{\lambda^2} \frac{1}{e^{\frac{hc}{\lambda kT} - 1}"
         ).scale(1.5)
@@ -964,10 +962,10 @@ class PhotoelectricEffectApparatus(VGroup):
         self.collector.shift(UP * plate_separation / 2)
 
         # Add labels
-        self.emitter_label = Text("Emitter\n(Photocathode)", font_size=18)
+        self.emitter_label = Text(_("Emitter"), font_size=18, font=FONT)
         self.emitter_label.next_to(self.emitter, DOWN, buff=0.3)
 
-        self.collector_label = Text("Collector\n(Anode)", font_size=18)
+        self.collector_label = Text(_("Collector"), font_size=18, font=FONT)
         self.collector_label.next_to(self.collector, UP, buff=0.3)
 
         # Add terminal connections (small circles for electrical connections)
@@ -1136,16 +1134,13 @@ class PhotoelectricEffect(Scene):
 
     def construct(self):
 
-        self.next_section(skip_animations=True)
-
         # Title
         title = Title(_("Photoelectric Effect"))
-        self.play(Write(title))
 
         # Create the apparatus
         apparatus = PhotoelectricEffectApparatus()
 
-        self.play(Write(title))
+        self.play(Write(title, reverse=True, remover=False))
         self.play(Create(apparatus), run_time=2)
 
         # Demonstrate photon hitting emitter and electron emission
@@ -1176,10 +1171,8 @@ class PhotoelectricEffect(Scene):
 
         self.play(apparatus.animate.to_edge(LEFT))
 
-        self.next_section()
-
-        w_min_prop = MathTex(r"W \propto \nu_0").to_edge(RIGHT, buff=1.5)
-        w_min = MathTex(r"W = h \nu_0").to_edge(RIGHT, buff=1.5)
+        w_min_prop = MathTex(r"W \propto \nu_0").to_edge(RIGHT, buff=2.5)
+        w_min = MathTex(r"W = h \nu_0").move_to(w_min_prop)
         k_max = MathTex(r"K_{max} = h\nu - W").next_to(w_min, DOWN)
 
         self.play(Write(w_min_prop[0][0]))
@@ -1189,5 +1182,255 @@ class PhotoelectricEffect(Scene):
         self.play(Write(k_max[0][0:4]))
         self.play(Write(k_max[0][4:7]))
         self.play(Write(k_max[0][7:]))
+
+        self.play(*[FadeOut(mob) for mob in self.mobjects if mob != title])
+        self.play(Transform(title, Title(_("Results...")).set_color(BLUE)))
+
+        results_points = BulletedList(
+            _("Max Planck showed energy is quantized."),
+            _("Correct prediction of black body radiation."),
+            _("Einstein showed light is quantized; photons."),
+            _("And their energy depends only on its frequency."),
+        ).move_to(ORIGIN)
+
+        for l in results_points:
+            self.play(Write(l, reverse=IS_RTL, remover=False))
+
+        self.wait()
+
+
+class EventTimeline(Group):
+    def __init__(
+        self,
+        events_dict,
+        timeline_length=10,
+        card_width=1.5,
+        card_height=2,
+        card_spacing=0.3,
+        image_scale=0.8,
+        timeline_color=WHITE,
+        card_color=WHITE,
+        card_stroke_width=2,
+        label_font_size=24,
+        year_font_size=20,
+        **kwargs,
+    ):
+        """
+        Create a timeline with event cards.
+
+        Parameters:
+        -----------
+        events_dict : dict
+            Dictionary where keys are years (int) and values are tuples of (label, image_path)
+        timeline_length : float
+            Length of the timeline line
+        card_width : float
+            Width of each event card
+        card_height : float
+            Height of each event card
+        card_spacing : float
+            Vertical spacing between timeline and cards
+        image_scale : float
+            Scale factor for images within cards
+        timeline_color : Color
+            Color of the timeline line
+        card_color : Color
+            Color of the card borders
+        card_stroke_width : float
+            Width of card border strokes
+        label_font_size : int
+            Font size for event labels
+        year_font_size : int
+            Font size for year markers
+        """
+        super().__init__(**kwargs)
+
+        self.events_dict = events_dict
+        self.timeline_length = timeline_length
+        self.card_width = card_width
+        self.card_height = card_height
+        self.card_spacing = card_spacing
+        self.image_scale = image_scale
+        self.timeline_color = timeline_color
+        self.card_color = card_color
+        self.card_stroke_width = card_stroke_width
+        self.label_font_size = label_font_size
+        self.year_font_size = year_font_size
+
+        self._create_timeline()
+
+    def _create_timeline(self):
+        """Create the timeline visualization."""
+        if not self.events_dict:
+            return
+
+        # Sort events by year
+        sorted_events = sorted(self.events_dict.items())
+        years = [year for year, _ in sorted_events]
+
+        # Create main timeline line
+        timeline_line = Line(
+            start=LEFT * self.timeline_length / 2,
+            end=RIGHT * self.timeline_length / 2,
+            color=self.timeline_color,
+            stroke_width=5,
+        )
+        self.add(timeline_line)
+
+        # Calculate positions for events along timeline
+        if len(years) == 1:
+            positions = [0]
+        else:
+            min_year, max_year = min(years), max(years)
+            year_range = max_year - min_year
+            if year_range == 0:
+                positions = [0]
+            else:
+                positions = [
+                    (year - min_year) / year_range * self.timeline_length
+                    - self.timeline_length / 2
+                    for year in years
+                ]
+
+        added_years = set()
+        # Create event cards and markers
+        for i, ((year, (label, image_path)), x_pos) in enumerate(
+            zip(sorted_events, positions)
+        ):
+            card_g = Group()
+            # Alternate card positions above and below timeline
+            card_y = (
+                self.card_spacing + self.card_height / 2
+                if i % 2 == 0
+                else -(self.card_spacing + self.card_height / 2)
+            )
+
+            # Create event card
+            event_card = self._create_event_card(label, image_path, x_pos, card_y)
+            card_g.add(event_card)
+
+            # Create timeline marker (small circle)
+            marker = Dot(
+                point=(x_pos, 0, 0),
+                radius=0.08,
+                color=config.background_color,
+                fill_opacity=1,
+                stroke_color=WHITE,
+                stroke_width=2,
+            ).set_z_index(2)
+            card_g.add(marker)
+
+            year_label = Text(
+                str(int(year)), font_size=self.year_font_size, color=self.timeline_color
+            ).next_to(marker, UP / 2 if i % 2 else DOWN / 2)
+
+            if int(year) not in added_years:
+                card_g.add(year_label)
+                added_years.add(int(year))
+
+            # Create connection line from marker to card
+            connection_line = Line(
+                start=(x_pos, 0, 0),
+                end=(x_pos, card_y - (self.card_height / 2 * np.sign(card_y)), 0),
+                color=self.timeline_color,
+                stroke_width=1,
+                stroke_opacity=0.7,
+            )
+            card_g.add(connection_line)
+
+            # Add this card group into the timeline group
+            self.add(card_g)
+
+    def _create_event_card(self, label, image_path, x_pos, y_pos):
+        """Create an individual event card."""
+        card_group = Group()
+
+        # Create card background
+        card_bg = Rectangle(
+            width=self.card_width,
+            height=self.card_height,
+            color=self.card_color,
+            stroke_width=self.card_stroke_width,
+            fill_opacity=1,
+            stroke_opacity=0.8,
+            fill_color=GRAY_E,
+        )
+
+        # Create label text (positioned at top of card)
+        label_text = Text(label, color=WHITE, font=FONT).scale(0.35)
+
+        # Try to load and add image
+        try:
+            image = ImageMobject(image_path)
+            # Scale image to fit in card, leaving space for label
+            available_height = self.card_height * 0.6  # 60% of card height for image
+            image.scale_to_fit_height(available_height * self.image_scale)
+            image.scale_to_fit_width(self.card_width * 0.8 * self.image_scale)
+
+            # Position image in center-bottom of card
+            image.move_to((0, -self.card_height * 0.1, 0))
+
+        except Exception as e:
+            # If image loading fails, create a placeholder
+            print(f"Warning: Could not load image {image_path}: {e}")
+            placeholder_rect = Rectangle(
+                width=self.card_width * 0.6,
+                height=self.card_height * 0.4,
+                color=GRAY,
+                fill_opacity=0.3,
+            ).move_to((0, -self.card_height * 0.1, 0))
+
+            # Add "No Image" text
+            no_img_text = Text("No Image", font_size=12, color=GRAY)
+            no_img_text.move_to(placeholder_rect.get_center())
+            image = Group(placeholder_rect, no_img_text)
+
+        # Position label at top of card
+        label_text.move_to((0, self.card_height * 0.4, 0))
+
+        # Combine all card elements
+        card_group.add(card_bg, label_text, image)
+        card_group.move_to((x_pos, y_pos, 0))
+
+        return card_group
+
+
+# Example usage and animation
+class EventTimelineScene(Scene):
+    def construct(self):
+        events = {
+            1896: (_("Wilhelm Wien"), "./figures/Wien2.jpg"),
+            1900: (_("Lord Rayleigh"), "./figures/John_William_Strutt.jpg"),
+            1900.01: (_("Max Planck"), "./figures/Max_Planck_1901.GIF"),
+            1905: (_("Albert Einstein"), "./figures/albert.jpg"),
+            1911: (_("Paul Ehrenfest"), "./figures/Paul_Ehrenfest.jpg"),
+            1918: (_("Nobel for Planck"), "./figures/planck-12909-portrait-medium.jpg"),
+            1921: (
+                _("Nobel for Einstein"),
+                "./figures/einstein-12923-portrait-medium.jpg",
+            ),
+        }
+
+        # Create timeline
+        timeline = EventTimeline(
+            events,
+            timeline_length=12,
+            card_width=2,
+            card_height=2.5,
+            card_spacing=0.5,
+        ).to_edge(DOWN)
+
+        # Add title
+        title = Text(
+            _("Historical Events Timeline"), font_size=36, color=BLUE, font=FONT
+        )
+        title.to_edge(UP, buff=0.5)
+
+        self.play(Write(title, reverse=True, remover=False))
+
+        # Animate timeline creation
+        self.play(Create(timeline[0]))  # Create work with VGroup only
+        for i in range(1, len(timeline)):
+            self.play(FadeIn(timeline[i]))
 
         self.wait()
